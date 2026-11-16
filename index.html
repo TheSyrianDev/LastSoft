@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LastSoft — local-first AI tooling</title>
+<meta name="description" content="Local-first AI tooling written in Rust: an assistant, its harness, an inference engine and a model downloader. No account, no cloud.">
+<link rel="icon" href="assets/lastai.png">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="wrap">
+  <a class="brand" href="./"><img src="assets/lastai-lockup-on-dark.svg" alt="Last AI" width="150" height="38"></a>
+  <nav>
+    <a href="#projects">Projects</a>
+    <a href="#install">Install</a>
+    <a href="https://github.com/TheSyrianDev">GitHub</a>
+  </nav>
+</header>
+
+<main class="wrap">
+
+  <section class="hero">
+    <h1>Local-first AI, on your own machine.</h1>
+    <p class="lede">
+      Four programs that run offline, speak to local model servers, and keep your
+      conversations, notes and money on your own disk. Written in Rust.
+    </p>
+  </section>
+
+  <section id="projects">
+    <h2>Projects</h2>
+
+    <article class="project">
+      <div class="project-head">
+        <h3><a href="https://github.com/TheSyrianDev/LastAI">Last AI</a></h3>
+        <span class="tag">the assistant</span>
+      </div>
+      <p>
+        A desktop app and a terminal client talking to a small local core over
+        localhost. The core holds the team (departments and their workers), the
+        tools, memory and learning, and works with any OpenAI-compatible server or
+        local runtime. Front ends are thin clients of the core's API.
+      </p>
+      <p class="meta">Alpha, 0.1.0 · Linux, Windows · macOS early alpha</p>
+    </article>
+
+    <article class="project">
+      <div class="project-head">
+        <h3>LH</h3>
+        <span class="tag">the harness</span>
+      </div>
+      <p>
+        The layer underneath Last AI: the core, the clients, memory, tools, the
+        provider layer and the spend limits. Plain and unopinionated — give it a
+        model and a goal, it runs the turn loop. No downloader, no inference
+        engine.
+      </p>
+      <p class="meta">Ships inside Last AI today</p>
+    </article>
+
+    <article class="project">
+      <div class="project-head">
+        <h3><a href="https://github.com/TheSyrianDev/LastEngine">LastEngine</a></h3>
+        <span class="tag">the engine</span>
+      </div>
+      <p>
+        Inference of its own. One backend trait, several implementations — CUDA,
+        CPU, Vulkan, ROCm, Metal — chosen at startup by probing what the machine
+        can actually do, and able to split layers across CPU and GPU for small
+        cards.
+      </p>
+      <p class="meta">In development</p>
+    </article>
+
+    <article class="project">
+      <div class="project-head">
+        <h3><a href="https://github.com/TheSyrianDev/hf-dl">hf-dl</a></h3>
+        <span class="tag">the downloader</span>
+      </div>
+      <p>
+        Models and datasets from the Hugging Face Hub, with resumable and verified
+        transfers. It is just a downloader, and it works on its own.
+      </p>
+      <p class="meta">v0.4.0-rc.1</p>
+    </article>
+  </section>
+
+  <section id="install">
+    <h2>Install Last AI</h2>
+    <p>
+      Prebuilt packages for the current alpha are on the
+      <a href="https://github.com/TheSyrianDev/LastAI/releases">releases page</a>.
+      Pick the one for your system.
+    </p>
+
+    <div class="install-grid">
+      <div class="install">
+        <h4>Debian, Ubuntu</h4>
+        <pre><code>sudo apt install ./LastAI-*.deb</code></pre>
+      </div>
+      <div class="install">
+        <h4>Fedora, openSUSE</h4>
+        <pre><code>sudo rpm -i LastAI-*.rpm</code></pre>
+      </div>
+      <div class="install">
+        <h4>Arch, Omarchy</h4>
+        <pre><code>sudo pacman -U LastAI-*.pkg.tar.zst
+lastai-omarchy-setup</code></pre>
+      </div>
+      <div class="install">
+        <h4>Anywhere else</h4>
+        <pre><code>chmod +x Last_AI-*.AppImage
+./Last_AI-*.AppImage</code></pre>
+      </div>
+    </div>
+
+    <p class="note">
+      Windows and macOS builds are attached to the same release. From source it is
+      <code>cargo build --release</code>, which needs a Rust toolchain and takes a
+      few minutes the first time.
+    </p>
+  </section>
+
+</main>
+
+<footer class="wrap">
+  <p>
+    <a href="https://github.com/TheSyrianDev">TheSyrianDev</a> ·
+    <a href="https://github.com/TheSyrianDev/LastAI/blob/main/LICENSE">PolyForm Noncommercial 1.0.0</a> ·
+    built with Rust
+  </p>
+  <p class="note">Everything here is pre-release software. Expect rough edges.</p>
+</footer>
+
+</body>
+</html>
