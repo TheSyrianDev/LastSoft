@@ -3,136 +3,189 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>LastSoft — local-first AI tooling</title>
-<meta name="description" content="Local-first AI tooling written in Rust: an assistant, its harness, an inference engine and a model downloader. No account, no cloud.">
+<title>Last AI — the last AI studio you'll need</title>
+<meta name="description" content="Last AI is a local-first AI studio for your own machine, built from three parts: the LastHarness harness, the LastEngine inference engine and the hf-dl downloader. No account, no cloud.">
+<meta name="theme-color" content="#0b120e">
 <link rel="icon" href="assets/lastai.png">
+<link rel="preconnect" href="https://cdn.fontshare.com" crossorigin>
+<link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@700,800&f[]=switzer@400,500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap">
 <link rel="stylesheet" href="style.css">
+<script>
+  document.documentElement.classList.add('motion');
+  addEventListener('load', function () {
+    if (!window.__lastsoftMotion) document.documentElement.classList.remove('motion');
+  });
+</script>
 </head>
 <body>
 
-<header class="wrap">
-  <a class="brand" href="./"><img src="assets/lastai-lockup-on-dark.svg" alt="Last AI" width="160" height="49"></a>
-  <nav>
-    <a href="#projects">Projects</a>
-    <a href="#install">Install</a>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="masthead">
+  <a class="wordmark" href="./" aria-label="LastSoft, home">
+    <img src="assets/lastai-lockup-on-dark.svg" alt="Last AI" width="160" height="49">
+  </a>
+  <nav class="masthead-nav" aria-label="Sections">
+    <a href="#assembly">What it's built from</a>
+    <a href="downloads.html">Download</a>
     <a href="https://github.com/TheSyrianDev">GitHub</a>
   </nav>
 </header>
 
-<main class="wrap">
+<main id="main">
 
   <section class="hero">
-    <h1>Local-first AI, on your own machine.</h1>
-    <p class="lede">
-      Four programs that run offline, speak to local model servers, and keep your
-      conversations, notes and money on your own disk. Written in Rust.
-    </p>
-  </section>
-
-  <section id="projects">
-    <h2>Projects</h2>
-
-    <article class="project">
-      <div class="project-head">
-        <h3><a href="https://github.com/TheSyrianDev/LastAI">Last AI</a></h3>
-        <span class="tag">the assistant</span>
-      </div>
-      <p>
-        A desktop app and a terminal client talking to a small local core over
-        localhost. The core holds the team (departments and their workers), the
-        tools, memory and learning, and works with any OpenAI-compatible server or
-        local runtime. Front ends are thin clients of the core's API.
+    <div class="hero-copy">
+      <h1 class="display" data-reveal>The last AI studio<br>you'll need.</h1>
+      <p class="lede" data-reveal>
+        A desktop app and a terminal client that keep the conversation, the
+        memory, the tools and the money on your own machine. Last AI is built
+        from three parts that are each useful alone: a harness, an inference
+        engine and a model downloader. No account, no cloud.
       </p>
-      <p class="meta">Alpha, 0.1.0 · Linux, Windows · macOS early alpha</p>
-    </article>
-
-    <article class="project">
-      <div class="project-head">
-        <h3>LH</h3>
-        <span class="tag">the harness</span>
+      <div class="hero-actions" data-reveal>
+        <a class="button" href="downloads.html">Download for your system</a>
+        <a class="link-arrow" href="#assembly">See what's inside</a>
       </div>
-      <p>
-        The layer underneath Last AI: the core, the clients, memory, tools, the
-        provider layer and the spend limits. Plain and unopinionated — give it a
-        model and a goal, it runs the turn loop. No downloader, no inference
-        engine.
-      </p>
-      <p class="meta">Ships inside Last AI today</p>
-    </article>
-
-    <article class="project">
-      <div class="project-head">
-        <h3><a href="https://github.com/TheSyrianDev/LastEngine">LastEngine</a></h3>
-        <span class="tag">the engine</span>
-      </div>
-      <p>
-        Inference of its own. One backend trait, several implementations — CUDA,
-        CPU, Vulkan, ROCm, Metal — chosen at startup by probing what the machine
-        can actually do, and able to split layers across CPU and GPU for small
-        cards.
-      </p>
-      <p class="meta">In development</p>
-    </article>
-
-    <article class="project">
-      <div class="project-head">
-        <h3><a href="https://github.com/TheSyrianDev/hf-dl">hf-dl</a></h3>
-        <span class="tag">the downloader</span>
-      </div>
-      <p>
-        Models and datasets from the Hugging Face Hub, with resumable and verified
-        transfers. It is just a downloader, and it works on its own.
-      </p>
-      <p class="meta">v0.4.0-rc.1</p>
-    </article>
-  </section>
-
-  <section id="install">
-    <h2>Install Last AI</h2>
-    <p>
-      Prebuilt packages for the current alpha are on the
-      <a href="https://github.com/TheSyrianDev/LastAI/releases">releases page</a>.
-      Pick the one for your system.
-    </p>
-
-    <div class="install-grid">
-      <div class="install">
-        <h4>Debian, Ubuntu</h4>
-        <pre><code>sudo apt install ./LastAI-*.deb</code></pre>
-      </div>
-      <div class="install">
-        <h4>Fedora, openSUSE</h4>
-        <pre><code>sudo rpm -i LastAI-*.rpm</code></pre>
-      </div>
-      <div class="install">
-        <h4>Arch, Omarchy</h4>
-        <pre><code>sudo pacman -U LastAI-*.pkg.tar.zst
-lastai-omarchy-setup</code></pre>
-      </div>
-      <div class="install">
-        <h4>Anywhere else</h4>
-        <pre><code>chmod +x Last_AI-*.AppImage
-./Last_AI-*.AppImage</code></pre>
-      </div>
+      <dl class="spec" data-reveal>
+        <div><dt>Current</dt><dd>0.1.0-alpha.1</dd></div>
+        <div><dt>Licence</dt><dd>PolyForm NC 1.0.0</dd></div>
+        <div><dt>Runs on</dt><dd>Linux · Windows · macOS</dd></div>
+      </dl>
     </div>
 
-    <p class="note">
-      Windows and macOS builds are attached to the same release. From source it is
-      <code>cargo build --release</code>, which needs a Rust toolchain and takes a
-      few minutes the first time.
+    <figure class="figure" id="assembly">
+      <div class="figure-frame">
+        <canvas id="figure-canvas" aria-hidden="true"></canvas>
+        <svg class="figure-dim" viewBox="0 0 60 320" preserveAspectRatio="none" aria-hidden="true">
+          <line x1="20" y1="16" x2="20" y2="304" stroke-dasharray="3 5"/>
+          <line x1="14" y1="16" x2="26" y2="16"/>
+          <line x1="14" y1="304" x2="26" y2="304"/>
+        </svg>
+      </div>
+      <figcaption>Fig. 1 — a goal moving through the team: core, departments, workers; the engine around them; models arriving from below.</figcaption>
+    </figure>
+  </section>
+
+  <section class="parts" aria-labelledby="parts-heading">
+    <h2 id="parts-heading" class="section-head" data-reveal>The studio, and the three parts under it</h2>
+
+    <ol class="part-list">
+      <li class="part" data-part="ai" data-reveal>
+        <span class="part-id">P-01</span>
+        <div class="part-body">
+          <h3><a href="https://github.com/TheSyrianDev/LastAI">Last AI</a></h3>
+          <p>
+            The studio. A desktop app and a terminal client (<code>la</code>)
+            speaking to a small local core (<code>lastaid</code>) over localhost.
+            The core holds the team of departments and workers, the tools, memory
+            and learning. Any OpenAI-compatible server or local runtime will do.
+          </p>
+        </div>
+        <span class="part-meta">0.1.0-alpha.1</span>
+      </li>
+
+      <li class="part" data-part="lh" data-reveal>
+        <span class="part-id">P-02</span>
+        <div class="part-body">
+          <h3>LastHarness</h3>
+          <p>
+            The harness underneath: the core, the clients, memory as Markdown you
+            can read, tools behind permission rules, the provider layer, the spend
+            limits. Give it a model and a goal and it runs the turn loop. No
+            downloader, no inference engine.
+          </p>
+        </div>
+        <span class="part-meta">inside Last AI</span>
+      </li>
+
+      <li class="part" data-part="engine" data-reveal>
+        <span class="part-id">P-03</span>
+        <div class="part-body">
+          <h3><a href="https://github.com/TheSyrianDev/LastEngine">LastEngine</a></h3>
+          <p>
+            Inference of its own. One backend trait, several implementations —
+            CUDA, CPU, Vulkan, ROCm, Metal — chosen at startup by probing the
+            hardware, with layers split across CPU and GPU for small cards.
+          </p>
+        </div>
+        <span class="part-meta">in development</span>
+      </li>
+
+      <li class="part" data-part="hfd" data-reveal>
+        <span class="part-id">P-04</span>
+        <div class="part-body">
+          <h3><a href="https://github.com/TheSyrianDev/hf-dl">hf-dl</a></h3>
+          <p>
+            Models and datasets from the Hugging Face Hub, with resumable and
+            verified transfers. It is just a downloader, and it works alone.
+          </p>
+        </div>
+        <span class="part-meta">v0.4.0-rc.1</span>
+      </li>
+    </ol>
+  </section>
+
+  <section class="tenets" aria-labelledby="tenets-heading">
+    <h2 id="tenets-heading" class="section-head" data-reveal>Three things it will not do</h2>
+    <dl class="tenet-list">
+      <div data-reveal>
+        <dt>Sign you in</dt>
+        <dd>There is no account, no telemetry endpoint, no billing behind a key.
+          Model calls go to the server you named, with the key you gave.</dd>
+      </div>
+      <div data-reveal>
+        <dt>Rewrite your prompt</dt>
+        <dd>Learned rules, style and skills are separate blocks added after the
+          base prompt. Every version is kept, and anything applied without
+          asking is logged so you can undo it.</dd>
+      </div>
+      <div data-reveal>
+        <dt>Hold your keys in a file</dt>
+        <dd>Secrets live in the OS store — Secret Service, Keychain, Credential
+          Manager. The config holds a reference like <code>secret:openrouter</code>,
+          never the value.</dd>
+      </div>
+    </dl>
+  </section>
+
+  <section class="get" aria-labelledby="get-heading">
+    <h2 id="get-heading" class="section-head" data-reveal>Get it</h2>
+    <p class="get-copy" data-reveal>
+      Prebuilt for Linux, Windows and macOS, with a script for Linux that works
+      out which distribution you are on before it installs anything.
     </p>
+    <div class="hero-actions" data-reveal>
+      <a class="button" href="downloads.html">Go to downloads</a>
+      <a class="link-arrow" href="https://github.com/TheSyrianDev/LastAI/releases">Every release</a>
+    </div>
   </section>
 
 </main>
 
-<footer class="wrap">
-  <p>
-    <a href="https://github.com/TheSyrianDev">TheSyrianDev</a> ·
-    <a href="https://github.com/TheSyrianDev/LastAI/blob/main/LICENSE">PolyForm Noncommercial 1.0.0</a> ·
-    built with Rust
-  </p>
-  <p class="note">Everything here is pre-release software. Expect rough edges.</p>
+<footer class="foot">
+  <div class="foot-brand">
+    <img src="assets/lastai-lockup-on-dark.svg" alt="Last AI" width="132" height="41">
+    <p>Written and maintained by <a href="https://github.com/TheSyrianDev">TheSyrianDev</a>.</p>
+  </div>
+  <nav class="foot-nav" aria-label="Projects and licence">
+    <a href="https://github.com/TheSyrianDev/LastAI">Last AI</a>
+    <a href="https://github.com/TheSyrianDev/LastEngine">LastEngine</a>
+    <a href="https://github.com/TheSyrianDev/hf-dl">hf-dl</a>
+    <a href="https://github.com/TheSyrianDev/LastAI/blob/main/LICENSE">PolyForm Noncommercial 1.0.0</a>
+  </nav>
+  <p class="foot-note">Pre-release software. Expect rough edges.</p>
 </footer>
 
+<script type="importmap">
+{
+  "imports": {
+    "three": "./vendor/three.module.js"
+  }
+}
+</script>
+<script src="vendor/motion.js"></script>
+<script type="module" src="main.js"></script>
 </body>
 </html>

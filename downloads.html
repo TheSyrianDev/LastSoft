@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Download Last AI — LastSoft</title>
+<meta name="description" content="Download Last AI for Linux, Windows or macOS. The Linux script detects your distribution, installs the matching package, and on Omarchy runs the desktop setup.">
+<meta name="theme-color" content="#0b120e">
+<link rel="icon" href="assets/lastai.png">
+<link rel="preconnect" href="https://cdn.fontshare.com" crossorigin>
+<link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@700,800&f[]=switzer@400,500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="style.css">
+<script>document.documentElement.classList.add('motion')</script>
+</head>
+<body>
+
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="masthead">
+  <a class="wordmark" href="./" aria-label="LastSoft, home">
+    <img src="assets/lastai-lockup-on-dark.svg" alt="Last AI" width="160" height="49">
+  </a>
+  <nav class="masthead-nav" aria-label="Sections">
+    <a href="./">The studio</a>
+    <a href="downloads.html" aria-current="page">Download</a>
+    <a href="https://github.com/TheSyrianDev/LastAI">Source</a>
+  </nav>
+</header>
+
+<main id="main">
+
+  <section class="download">
+    <h1 class="display">Download<br>Last AI.</h1>
+    <p class="lede">
+      One alpha, built by CI from the tagged source. Everything is the same
+      program; the packages differ in how it lands on your disk.
+    </p>
+
+    <dl class="detect" id="detect">
+      <div><dt>Your system</dt><dd id="detect-os">checking…</dd></div>
+      <div><dt>Latest</dt><dd id="detect-version">0.1.0-alpha.1</dd></div>
+      <div><dt>Published</dt><dd id="detect-date">—</dd></div>
+    </dl>
+
+    <noscript>
+      <p class="install-note">
+        The buttons below need JavaScript to resolve the release files. Without
+        it, use <a href="https://github.com/TheSyrianDev/LastAI/releases">the
+        release page</a> instead.
+      </p>
+    </noscript>
+
+    <div class="dl-list">
+
+      <article class="dl-row" data-os="linux">
+        <header class="dl-row-head">
+          <h2>Linux</h2>
+          <span class="dl-flag" data-flag-for="linux">x86_64 · AppImage, deb, rpm, Arch</span>
+        </header>
+        <p class="dl-copy">
+          The AppImage runs anywhere and needs nothing installed. The script
+          below reads <code>/etc/os-release</code> and installs the package your
+          distribution actually wants — and on Omarchy it installs the Omarchy
+          build and runs <code>lastai-omarchy-setup</code>.
+        </p>
+
+        <div class="dl-actions">
+          <a class="button" data-asset="appimage" href="https://github.com/TheSyrianDev/LastAI/releases">
+            Download the AppImage
+          </a>
+          <div class="cmd cmd-script" data-copy="curl -fsSL https://thesyriandev.github.io/lastsoft/install.sh | sh">
+            <code>curl -fsSL https://thesyriandev.github.io/lastsoft/install.sh | sh</code>
+            <button class="copy" type="button">Copy</button>
+          </div>
+        </div>
+
+        <p class="dl-hint">
+          <span class="dl-hint-mark">Omarchy</span>
+          The script detects it and handles the desktop: the Arch package, the
+          theme hook, the transparent look.
+          <a href="install.sh">Read the script</a>
+          before running it, as with anything you pipe into a shell.
+        </p>
+
+        <ul class="dl-packages">
+          <li>
+            <a data-asset="deb" href="https://github.com/TheSyrianDev/LastAI/releases">.deb</a>
+            <span>Debian, Ubuntu, Mint, Pop!_OS</span>
+          </li>
+          <li>
+            <a data-asset="rpm" href="https://github.com/TheSyrianDev/LastAI/releases">.rpm</a>
+            <span>Fedora, RHEL, openSUSE</span>
+          </li>
+          <li>
+            <a data-asset="pkg" href="https://github.com/TheSyrianDev/LastAI/releases">.pkg.tar.zst</a>
+            <span>Arch, Omarchy, EndeavourOS</span>
+          </li>
+        </ul>
+      </article>
+
+      <article class="dl-row" data-os="windows">
+        <header class="dl-row-head">
+          <h2>Windows</h2>
+          <span class="dl-flag" data-flag-for="windows">x64 · zip, no installer yet</span>
+        </header>
+        <p class="dl-copy">
+          Unpack the zip anywhere and run <code>lastai-gui.exe</code>. The core
+          (<code>lastaid.exe</code>) and the terminal client (<code>la.exe</code>)
+          are in the same folder.
+        </p>
+        <div class="dl-actions">
+          <a class="button" data-asset="zip" href="https://github.com/TheSyrianDev/LastAI/releases">
+            Download for Windows
+          </a>
+        </div>
+      </article>
+
+      <article class="dl-row" data-os="macos">
+        <header class="dl-row-head">
+          <h2>macOS</h2>
+          <span class="dl-flag" data-flag-for="macos">Apple silicon · dmg, early alpha</span>
+        </header>
+        <p class="dl-copy">
+          The dmg is signed for nothing yet, so the first launch needs
+          right-click → Open. It starts in CI; nobody has used it day to day.
+        </p>
+        <div class="dl-actions">
+          <a class="button" data-asset="dmg" href="https://github.com/TheSyrianDev/LastAI/releases">
+            Download for macOS
+          </a>
+        </div>
+      </article>
+
+    </div>
+
+    <section class="dl-source" aria-labelledby="source-heading">
+      <h2 id="source-heading" class="section-head">Or build it</h2>
+      <p class="install-note">
+        A Rust toolchain and a few minutes. This builds the core, both terminal
+        names and the desktop app into <code>target/release/</code>.
+      </p>
+      <div class="cmd" data-copy="git clone https://github.com/TheSyrianDev/LastAI &amp;&amp; cd LastAI &amp;&amp; cargo build --release">
+        <code>git clone https://github.com/TheSyrianDev/LastAI &amp;&amp; cd LastAI &amp;&amp; cargo build --release</code>
+        <button class="copy" type="button">Copy</button>
+      </div>
+      <p class="install-note">
+        Then <code>target/release/la setup</code> for the first run, and
+        <code>target/release/lastaid</code> to start the core.
+      </p>
+    </section>
+
+    <p class="dl-all">
+      Every build, ever: <a href="https://github.com/TheSyrianDev/LastAI/releases">the release page</a>.
+    </p>
+
+  </section>
+
+</main>
+
+<footer class="foot">
+  <div class="foot-brand">
+    <img src="assets/lastai-lockup-on-dark.svg" alt="Last AI" width="132" height="41">
+    <p>Written and maintained by <a href="https://github.com/TheSyrianDev">TheSyrianDev</a>.</p>
+  </div>
+  <nav class="foot-nav" aria-label="Projects and licence">
+    <a href="https://github.com/TheSyrianDev/LastAI">Last AI</a>
+    <a href="https://github.com/TheSyrianDev/LastEngine">LastEngine</a>
+    <a href="https://github.com/TheSyrianDev/hf-dl">hf-dl</a>
+    <a href="https://github.com/TheSyrianDev/LastAI/blob/main/LICENSE">PolyForm Noncommercial 1.0.0</a>
+  </nav>
+  <p class="foot-note">Pre-release software. Expect rough edges.</p>
+</footer>
+
+<script src="vendor/motion.js"></script>
+<script type="module" src="downloads.js"></script>
+</body>
+</html>
