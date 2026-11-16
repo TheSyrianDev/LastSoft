@@ -13,8 +13,8 @@ const MATCH = {
   rpm: (n) => n.endsWith("-x86_64.rpm"),
   omarchy: (n) => n.includes("-omarchy-") && n.endsWith(".pkg.tar.zst"),
   pkg: (n) => n.endsWith(".pkg.tar.zst") && !n.includes("omarchy"),
-  dmg: (n) => n.endsWith(".dmg"),
-  zip: (n) => n.endsWith(".zip"),
+  zip: (n) => n.endsWith(".zip") && n.includes("windows"),
+  mac: (n) => (n.endsWith(".zip") && n.includes("macos")) || n.endsWith(".dmg"),
 };
 
 function bytes(n) {

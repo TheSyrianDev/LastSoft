@@ -48,9 +48,9 @@ it has to justify itself in seconds and must not be slow.
 
 ## Capabilities and Constraints
 
-- Last AI: alpha 0.1.0-alpha.1, Linux (deb, rpm, Arch/Omarchy, AppImage), Windows
-  zip, macOS dmg (early alpha). Desktop app, terminal client (`la`/`lastai`), a
-  local core (`lastaid`).
+- Last AI: alpha 0.1.0-alpha.2, Linux (deb, rpm, Arch, Omarchy, AppImage),
+  Windows zip, macOS `.app` in a zip (early alpha). Desktop app, terminal client
+  (`la`/`lastai`), a local core (`lastaid`).
 - LH: the harness inside Last AI today; not a separate downloadable artifact.
 - LastEngine: in development; no release to link.
 - hf-dl: v0.4.0-rc.1.
