@@ -5,13 +5,16 @@
 const REPO = "TheSyrianDev/LastAI";
 const API = `https://api.github.com/repos/${REPO}/releases?per_page=1`;
 
-const SUFFIXES = {
-  appimage: ".AppImage",
-  deb: "amd64.deb",
-  rpm: "-x86_64.rpm",
-  pkg: "-x86_64.pkg.tar.zst",
-  dmg: ".dmg",
-  zip: ".zip",
+// The Omarchy package is its own build, so the plain Arch package must not match
+// it: both end in .pkg.tar.zst and only the name separates them.
+const MATCH = {
+  appimage: (n) => n.endsWith(".AppImage"),
+  deb: (n) => n.endsWith("amd64.deb"),
+  rpm: (n) => n.endsWith("-x86_64.rpm"),
+  omarchy: (n) => n.includes("-omarchy-") && n.endsWith(".pkg.tar.zst"),
+  pkg: (n) => n.endsWith(".pkg.tar.zst") && !n.includes("omarchy"),
+  dmg: (n) => n.endsWith(".dmg"),
+  zip: (n) => n.endsWith(".zip"),
 };
 
 function bytes(n) {
@@ -83,8 +86,8 @@ async function release() {
   if (versionOut) versionOut.textContent = (rel.tag_name ?? "").replace(/^v/, "");
   if (dateOut) dateOut.textContent = formatDate(rel.published_at);
 
-  for (const [key, suffix] of Object.entries(SUFFIXES)) {
-    const asset = rel.assets.find((a) => a.name.endsWith(suffix));
+  for (const [key, matches] of Object.entries(MATCH)) {
+    const asset = rel.assets.find((a) => matches(a.name));
     if (!asset) continue;
 
     const link = document.querySelector(`a[data-asset="${key}"]`);

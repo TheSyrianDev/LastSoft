@@ -4,10 +4,11 @@
 #   curl -fsSL https://thesyriandev.github.io/lastsoft/install.sh | sh
 #
 # It reads /etc/os-release, picks the build that matches the distribution, and
-# installs it: the Arch package on Arch and Omarchy, the .deb on Debian and its
-# children, the .rpm on Fedora and SUSE, and the AppImage anywhere else. On
-# Omarchy it also runs `lastai-omarchy-setup`, which is what makes the app match
-# the desktop.
+# installs it: on Omarchy the Omarchy package (lastai-omarchy, the only build
+# compiled with Omarchy's theme integration), on the other Arch distributions the
+# plain Arch package, the .deb on Debian and its children, the .rpm on Fedora and
+# SUSE, and the AppImage anywhere else. On Omarchy it then runs
+# `lastai-omarchy-setup`, which is what makes the app follow the desktop theme.
 #
 #   --dry-run     print what would happen, download nothing
 #   --appimage    skip the package managers and install the AppImage
@@ -50,10 +51,11 @@ Install Last AI on Linux.
   curl -fsSL https://thesyriandev.github.io/lastsoft/install.sh | sh
 
 It reads /etc/os-release, picks the build that matches the distribution, and
-installs it: the Arch package on Arch and Omarchy, the .deb on Debian and its
-children, the .rpm on Fedora and SUSE, and the AppImage anywhere else. On
-Omarchy it also runs `lastai-omarchy-setup`, which is what makes the app match
-the desktop.
+installs it: on Omarchy the Omarchy package (lastai-omarchy, the only build
+compiled with Omarchy's theme integration), on the other Arch distributions the
+plain Arch package, the .deb on Debian and its children, the .rpm on Fedora and
+SUSE, and the AppImage anywhere else. On Omarchy it then runs
+`lastai-omarchy-setup`, which is what makes the app follow the desktop theme.
 
   --dry-run     print what would happen, download nothing
   --appimage    skip the package managers and install the AppImage
@@ -162,18 +164,25 @@ tag=$(printf '%s' "$json" |
   sed 's/.*"\([^"]*\)"$/\1/')
 [ -n "$tag" ] || die "no release found (the API returned nothing useful)"
 
-# first asset URL whose name ends in the given suffix
-asset() {
-  printf '%s' "$json" |
-    grep -o '"browser_download_url"[[:space:]]*:[[:space:]]*"[^"]*'"$1"'"' |
-    head -1 |
-    sed 's/.*"\(https[^"]*\)".*/\1/'
+urls=$(printf '%s' "$json" |
+  grep -o '"browser_download_url"[^,]*' |
+  sed 's/.*"\(https[^"]*\)".*/\1/')
+
+# first asset whose name contains $1 and does not contain $2
+pick() {
+  printf '%s\n' "$urls" | while IFS= read -r u; do
+    case "$u" in *"$1"*) ;; *) continue ;; esac
+    if [ -n "${2:-}" ]; then case "$u" in *"$2"*) continue ;; esac; fi
+    printf '%s\n' "$u"
+    break
+  done
 }
 
-deb_url=$(asset 'amd64.deb')
-rpm_url=$(asset '-x86_64.rpm')
-pkg_url=$(asset '-x86_64.pkg.tar.zst')
-appimage_url=$(asset '.AppImage')
+deb_url=$(pick 'amd64.deb')
+rpm_url=$(pick '-x86_64.rpm')
+omarchy_url=$(pick 'LastAI-omarchy-' '')
+pkg_url=$(pick 'pkg.tar.zst' 'omarchy')
+appimage_url=$(pick '.AppImage')
 
 say "${DIM}release:$OFF $tag"
 
@@ -196,7 +205,7 @@ else
 fi
 
 case "$target" in
-  omarchy)  what="the Arch package, then lastai-omarchy-setup" ;;
+  omarchy)  what="the Omarchy package (lastai-omarchy), then lastai-omarchy-setup" ;;
   arch)     what="the Arch package" ;;
   debian)   what="the .deb package" ;;
   fedora)   what="the .rpm package" ;;
@@ -235,7 +244,8 @@ if [ "$DRY_RUN" -eq 1 ]; then
     debian)   say "  would run: ${SUDO:+$SUDO }apt-get install -y ./<release>.deb" ; url="$deb_url" ;;
     fedora)   say "  would run: ${SUDO:+$SUDO }dnf install -y ./<release>.rpm" ; url="$rpm_url" ;;
     suse)     say "  would run: ${SUDO:+$SUDO }zypper install -y --allow-unsigned-rpm ./<release>.rpm" ; url="$rpm_url" ;;
-    arch|omarchy) say "  would run: ${SUDO:+$SUDO }pacman -U --noconfirm ./<release>.pkg.tar.zst" ; url="$pkg_url" ;;
+    arch)     say "  would run: ${SUDO:+$SUDO }pacman -U --noconfirm ./<release>.pkg.tar.zst" ; url="$pkg_url" ;;
+    omarchy)  say "  would run: ${SUDO:+$SUDO }pacman -U --noconfirm ./<release>.pkg.tar.zst" ; url="${omarchy_url:-$pkg_url}" ;;
     appimage) say "  would run: install -Dm755 <release>.AppImage $APPIMAGE_DEST" ; url="$appimage_url" ;;
   esac
   say "  asset: ${url:-none found for this release}"
@@ -247,7 +257,11 @@ fi
 case "$target" in
   debian) url="$deb_url"; ext="deb" ;;
   fedora|suse) url="$rpm_url"; ext="rpm" ;;
-  arch|omarchy) url="$pkg_url"; ext="pkg.tar.zst" ;;
+  arch) url="$pkg_url"; ext="pkg.tar.zst" ;;
+  omarchy)
+    url="${omarchy_url:-$pkg_url}"; ext="pkg.tar.zst"
+    [ -n "$omarchy_url" ] || warn "release $tag has no lastai-omarchy package; the Arch package in it already includes the integration"
+    ;;
   appimage) url="$appimage_url"; ext="AppImage" ;;
 esac
 

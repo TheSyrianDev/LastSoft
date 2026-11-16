@@ -61,8 +61,8 @@
         <p class="dl-copy">
           The AppImage runs anywhere and needs nothing installed. The script
           below reads <code>/etc/os-release</code> and installs the package your
-          distribution actually wants — and on Omarchy it installs the Omarchy
-          build and runs <code>lastai-omarchy-setup</code>.
+          distribution actually wants. On Omarchy it installs the Omarchy build
+          below instead of this one.
         </p>
 
         <div class="dl-actions">
@@ -76,11 +76,10 @@
         </div>
 
         <p class="dl-hint">
-          <span class="dl-hint-mark">Omarchy</span>
-          The script detects it and handles the desktop: the Arch package, the
-          theme hook, the transparent look.
-          <a href="install.sh">Read the script</a>
-          before running it, as with anything you pipe into a shell.
+          <span class="dl-hint-mark">Script</span>
+          <a href="install.sh">Read it</a> before running it, as with anything
+          you pipe into a shell. It knows Omarchy from the plain Arch
+          distributions and picks the right package from there.
         </p>
 
         <ul class="dl-packages">
@@ -94,9 +93,41 @@
           </li>
           <li>
             <a data-asset="pkg" href="https://github.com/TheSyrianDev/LastAI/releases">.pkg.tar.zst</a>
-            <span>Arch, Omarchy, EndeavourOS</span>
+            <span>Arch, EndeavourOS, Manjaro</span>
           </li>
         </ul>
+      </article>
+
+      <article class="dl-row" data-os="omarchy">
+        <header class="dl-row-head">
+          <h2>Omarchy</h2>
+          <span class="dl-flag">arch · its own build</span>
+        </header>
+        <p class="dl-copy">
+          A separate package, not the Arch one: it is compiled with Omarchy's
+          integration, so the <em>Omarchy</em> and <em>Omarchy (transparent)</em>
+          looks take the colours of your current theme and follow
+          <code>omarchy theme set</code>, and the launcher icon is redrawn on
+          every change. It installs the same commands, so pacman swaps it in for
+          the plain package.
+        </p>
+
+        <div class="dl-actions">
+          <a class="button" data-asset="omarchy" href="https://github.com/TheSyrianDev/LastAI/releases">
+            Download for Omarchy
+          </a>
+          <div class="cmd cmd-script" data-copy="curl -fsSL https://thesyriandev.github.io/lastsoft/install.sh | sh">
+            <code>curl -fsSL https://thesyriandev.github.io/lastsoft/install.sh | sh</code>
+            <button class="copy" type="button">Copy</button>
+          </div>
+        </div>
+
+        <p class="dl-hint">
+          <span class="dl-hint-mark">Setup</span>
+          The package ships <code>lastai-omarchy-setup</code>; run it once as
+          yourself after installing (the script does it for you). It writes the
+          theme hook and leaves your Hyprland config alone.
+        </p>
       </article>
 
       <article class="dl-row" data-os="windows">
