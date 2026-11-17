@@ -10,7 +10,24 @@
 <link rel="preconnect" href="https://cdn.fontshare.com" crossorigin>
 <link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@700,800&f[]=switzer@400,500&display=swap">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap">
+<script>
+  // Paint the theme before the first frame: replay the stored palette, or the
+  // attribute a pinned choice names. theme.js takes over from here.
+  (function () {
+    try {
+      var root = document.documentElement;
+      var choice = localStorage.getItem("lastai-site-theme") || "auto";
+      if (choice !== "auto") { root.dataset.theme = choice; return; }
+      var saved = localStorage.getItem("lastai-site-vars");
+      if (!saved) return;
+      var theme = JSON.parse(saved);
+      for (var name in theme.vars) root.style.setProperty(name, theme.vars[name]);
+      root.style.colorScheme = theme.mode || "dark";
+    } catch (e) {}
+  })();
+</script>
 <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="themes.css">
 <script>document.documentElement.classList.add('motion')</script>
 </head>
 <body>
@@ -18,14 +35,36 @@
 <a class="skip" href="#main">Skip to content</a>
 
 <header class="masthead">
-  <a class="wordmark" href="./" aria-label="LastSoft, home">
-    <img src="assets/lastai-lockup-on-dark.svg" alt="Last AI" width="160" height="49">
+  <a class="wordmark" href="./" aria-label="Last AI, home">
+      <svg viewBox="0 0 208 64" role="img" aria-label="Last AI">
+        <rect x="8" y="18" width="38" height="38" rx="15" fill="var(--accent)"/>
+        <g transform="translate(2.4 -2) rotate(-8 27 37)" fill="var(--on-accent)">
+          <rect x="18.6" y="30.6" width="6" height="11" rx="3"/>
+          <rect x="30.1" y="31.4" width="4.6" height="10.2" rx="2.3"/>
+        </g>
+        <circle cx="49" cy="15" r="6" fill="var(--accent-2)"/>
+        <g transform="translate(70 12.57142857142857) scale(0.6785714285714286)">
+          <g fill="none" stroke="var(--ink)" stroke-width="8.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 8V64"/><circle cx="35" cy="47" r="15"/><path d="M50 32V64"/>
+            <path d="M88 39C88 34 83 32 77 32C69 32 65 36 65 40C65 44 69 46 77 47C85 48 89 50 89 54C89 59 84 62 77 62C70 62 66 59 65 55"/>
+            <path d="M110 16V51A13 13 0 0 0 123 64H126M101 32H125"/>
+          </g>
+          <g fill="none" stroke="var(--accent)" stroke-width="8.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M152 64L165.2 15A4 4 0 0 1 169.8 15L182 64M159 47H176"/><path d="M198 8V64"/>
+          </g>
+        </g>
+      </svg>
   </a>
   <nav class="masthead-nav" aria-label="Sections">
-    <a href="./">The studio</a>
+    <a href="./">Studio</a>
+    <a href="./#crew">The team</a>
     <a href="downloads.html" aria-current="page">Download</a>
     <a href="https://github.com/TheSyrianDev/LastAI">Source</a>
   </nav>
+  <button class="theme-btn" type="button" data-theme-open aria-haspopup="dialog" aria-label="Theme">
+    <span class="theme-btn-swatch" data-theme-swatch aria-hidden="true"></span>
+    <span data-theme-label>Theme</span>
+  </button>
 </header>
 
 <main id="main">
@@ -193,7 +232,24 @@
 
 <footer class="foot">
   <div class="foot-brand">
-    <img src="assets/lastai-lockup-on-dark.svg" alt="Last AI" width="132" height="41">
+      <svg viewBox="0 0 208 64" role="img" aria-label="Last AI">
+        <rect x="8" y="18" width="38" height="38" rx="15" fill="var(--accent)"/>
+        <g transform="translate(2.4 -2) rotate(-8 27 37)" fill="var(--on-accent)">
+          <rect x="18.6" y="30.6" width="6" height="11" rx="3"/>
+          <rect x="30.1" y="31.4" width="4.6" height="10.2" rx="2.3"/>
+        </g>
+        <circle cx="49" cy="15" r="6" fill="var(--accent-2)"/>
+        <g transform="translate(70 12.57142857142857) scale(0.6785714285714286)">
+          <g fill="none" stroke="var(--ink)" stroke-width="8.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 8V64"/><circle cx="35" cy="47" r="15"/><path d="M50 32V64"/>
+            <path d="M88 39C88 34 83 32 77 32C69 32 65 36 65 40C65 44 69 46 77 47C85 48 89 50 89 54C89 59 84 62 77 62C70 62 66 59 65 55"/>
+            <path d="M110 16V51A13 13 0 0 0 123 64H126M101 32H125"/>
+          </g>
+          <g fill="none" stroke="var(--accent)" stroke-width="8.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M152 64L165.2 15A4 4 0 0 1 169.8 15L182 64M159 47H176"/><path d="M198 8V64"/>
+          </g>
+        </g>
+      </svg>
     <p>Written and maintained by <a href="https://github.com/TheSyrianDev">TheSyrianDev</a>.</p>
   </div>
   <nav class="foot-nav" aria-label="Projects and licence">
@@ -207,5 +263,7 @@
 
 <script src="vendor/motion.js"></script>
 <script type="module" src="downloads.js"></script>
+<script src="themes.js"></script>
+<script type="module" src="theme.js"></script>
 </body>
 </html>

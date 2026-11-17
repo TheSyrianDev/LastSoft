@@ -41,16 +41,31 @@ async function figure() {
   const rig = new THREE.Group();
   scene.add(rig);
 
-  const INK = 0xece6d7;
-  const GREEN = 0xb2c27c;
-  const ORANGE = 0xe0a050;
-  const LEAF = 0x93a563;
+  // The scene takes its colours from the page's tokens, so Fig. 1 follows the
+  // theme like everything else; `lastai:theme` re-reads them on a swap.
+  const palette = () => {
+    const styles = getComputedStyle(document.documentElement);
+    const read = (name, fallback) => new THREE.Color(styles.getPropertyValue(name).trim() || fallback);
+    return {
+      ink: read("--ink", "#ece6d7"),
+      accent: read("--accent", "#b2c27c"),
+      second: read("--accent-2", "#e0a050"),
+      leaf: read("--leaf", "#93a563"),
+    };
+  };
+  let colours = palette();
+  const themed = [];
+  const tint = (material, key) => {
+    material.color.copy(colours[key]);
+    themed.push([material, key]);
+    return material;
+  };
 
   const sphere = new THREE.SphereGeometry(1, 14, 12);
   const dot = (color, radius, opacity = 1) => {
     const mesh = new THREE.Mesh(
       sphere,
-      new THREE.MeshBasicMaterial({ color, transparent: true, opacity })
+      new THREE.MeshBasicMaterial({ color: color.clone(), transparent: true, opacity })
     );
     mesh.scale.setScalar(radius);
     return mesh;
@@ -65,19 +80,21 @@ async function figure() {
   const team = new THREE.Group();
   rig.add(team);
 
-  const core = dot(GREEN, 0.19);
+  const core = dot(colours.accent, 0.19);
   team.add(core);
 
   // a soft halo so the hub reads as the source of the work
   const halo = new THREE.Mesh(
     new THREE.SphereGeometry(1, 20, 16),
-    new THREE.MeshBasicMaterial({
-      color: GREEN,
-      transparent: true,
-      opacity: 0.11,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false,
-    })
+    tint(
+      new THREE.MeshBasicMaterial({
+        transparent: true,
+        opacity: 0.11,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+      }),
+      "accent"
+    )
   );
   halo.scale.setScalar(0.52);
   team.add(halo);
@@ -99,7 +116,7 @@ async function figure() {
     const dir = new THREE.Vector3(...DEPT_DIRS[d]).normalize();
     const center = dir.clone().multiplyScalar(RING);
 
-    const node = dot(INK, 0.11, 0.95);
+    const node = dot(colours.ink, 0.11, 0.95);
     node.position.copy(center);
     node.userData.phase = d * 1.7;
     node.userData.dir = dir.clone();
@@ -122,7 +139,7 @@ async function figure() {
         .add(bitangent.clone().multiplyScalar(Math.sin(a) * SPREAD))
         .add(dir.clone().multiplyScalar(0.22));
 
-      const worker = dot(LEAF, 0.062, 0.9);
+      const worker = dot(colours.leaf, 0.062, 0.9);
       worker.position.copy(pos);
       worker.userData.phase = d * 1.7 + w * 0.9;
       workers.push(worker);
@@ -141,7 +158,7 @@ async function figure() {
   edgeGeometry.setAttribute("position", new THREE.BufferAttribute(edgePositions, 3));
   const edgeLines = new THREE.LineSegments(
     edgeGeometry,
-    new THREE.LineBasicMaterial({ color: INK, transparent: true, opacity: 0.22 })
+    tint(new THREE.LineBasicMaterial({ transparent: true, opacity: 0.22 }), "ink")
   );
   rig.add(edgeLines);
 
@@ -152,7 +169,7 @@ async function figure() {
   flowGeometry.setAttribute("position", new THREE.BufferAttribute(flowPositions, 3));
   const flow = new THREE.Points(
     flowGeometry,
-    new THREE.PointsMaterial({ color: ORANGE, size: 0.085, transparent: true, opacity: 0.95 })
+    tint(new THREE.PointsMaterial({ size: 0.085, transparent: true, opacity: 0.95 }), "second")
   );
   rig.add(flow);
 
@@ -160,14 +177,14 @@ async function figure() {
   const engine = new THREE.Group();
   const ring = new THREE.Mesh(
     new THREE.TorusGeometry(3.02, 0.012, 3, 120),
-    new THREE.MeshBasicMaterial({ color: INK, transparent: true, opacity: 0.3 })
+    tint(new THREE.MeshBasicMaterial({ transparent: true, opacity: 0.3 }), "ink")
   );
   ring.rotation.x = Math.PI / 2;
   engine.add(ring);
 
   const ringInner = new THREE.Mesh(
     new THREE.TorusGeometry(2.9, 0.005, 3, 120),
-    new THREE.MeshBasicMaterial({ color: INK, transparent: true, opacity: 0.16 })
+    tint(new THREE.MeshBasicMaterial({ transparent: true, opacity: 0.16 }), "ink")
   );
   ringInner.rotation.x = Math.PI / 2;
   engine.add(ringInner);
@@ -177,7 +194,7 @@ async function figure() {
     const a = (i / 4) * Math.PI * 2;
     const tick = new THREE.Mesh(
       new THREE.BoxGeometry(0.16, 0.006, 0.006),
-      new THREE.MeshBasicMaterial({ color: ORANGE, transparent: true, opacity: 0.55 })
+      tint(new THREE.MeshBasicMaterial({ transparent: true, opacity: 0.55 }), "second")
     );
     tick.position.set(Math.cos(a) * 3.02, 0, Math.sin(a) * 3.02);
     tick.rotation.y = -a;
@@ -190,7 +207,7 @@ async function figure() {
 
   /* ------------------------------------------------------ the downloader */
   const feed = new THREE.Group();
-  const feedNode = dot(ORANGE, 0.075, 1);
+  const feedNode = dot(colours.second, 0.075, 1);
   feedNode.position.set(0, -2.15, 0);
   feed.add(feedNode);
 
@@ -199,13 +216,15 @@ async function figure() {
       new THREE.Vector3(0, -2.15, 0),
       new THREE.Vector3(0, 0, 0),
     ]),
-    new THREE.LineDashedMaterial({
-      color: ORANGE,
-      dashSize: 0.07,
-      gapSize: 0.09,
-      transparent: true,
-      opacity: 0.45,
-    })
+    tint(
+      new THREE.LineDashedMaterial({
+        dashSize: 0.07,
+        gapSize: 0.09,
+        transparent: true,
+        opacity: 0.45,
+      }),
+      "second"
+    )
   );
   feedEdge.computeLineDistances();
   feed.add(feedEdge);
@@ -226,6 +245,11 @@ async function figure() {
 
   resize();
   new ResizeObserver(resize).observe(frame);
+
+  document.addEventListener("lastai:theme", () => {
+    colours = palette();
+    for (const [material, key] of themed) material.color.copy(colours[key]);
+  });
 
   /* -------------------------------------------------------- hover wiring */
   const rows = [...document.querySelectorAll(".part[data-part]")];
@@ -300,31 +324,31 @@ async function figure() {
     for (const node of depts) {
       const s = 0.11 * born * lift * (1 + Math.sin(elapsed * 1.1 + node.userData.phase) * 0.06);
       node.scale.setScalar(s);
-      node.material.color.setHex(level.team ? GREEN : INK);
+      node.material.color.copy(level.team ? colours.accent : colours.ink);
       node.material.opacity = 0.95 * born * (level.team ? 1 : level.engine || level.feed ? 0.28 : 0.95);
     }
     for (const node of workers) {
       const s = 0.062 * born * lift;
       node.scale.setScalar(s);
-      node.material.color.setHex(level.team ? GREEN : LEAF);
+      node.material.color.copy(level.team ? colours.accent : colours.leaf);
       node.material.opacity = 0.9 * born * (level.team ? 1 : level.engine || level.feed ? 0.18 : 0.9);
     }
 
-    core.material.color.setHex(level.team ? INK : GREEN);
+    core.material.color.copy(level.team ? colours.ink : colours.accent);
     edgeLines.material.opacity =
       (level.team ? 0.45 : level.engine || level.feed ? 0.08 : 0.22) * born;
 
     ring.material.opacity = 0.3 * born * (level.engine ? 3 : 1);
-    ring.material.color.setHex(level.engine ? GREEN : INK);
+    ring.material.color.copy(level.engine ? colours.accent : colours.ink);
     ringInner.material.opacity = 0.16 * born * (level.engine ? 2.6 : 1);
     engine.scale.setScalar(1 + level.engine * 0.02);
     engine.children.slice(2).forEach((tickMesh) => {
       tickMesh.material.opacity = 0.55 * born * (level.engine ? 1.4 : 1);
     });
 
-    feedNode.material.color.setHex(level.feed ? GREEN : ORANGE);
+    feedNode.material.color.copy(level.feed ? colours.accent : colours.second);
     feedEdge.material.opacity = 0.45 * born * (level.feed ? 1.6 : 1);
-    feedEdge.material.color.setHex(level.feed ? GREEN : ORANGE);
+    feedEdge.material.color.copy(level.feed ? colours.accent : colours.second);
     feed.scale.setScalar(1 + level.feed * 0.05);
 
     // the work, running from the core out to the workers

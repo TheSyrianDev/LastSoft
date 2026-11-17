@@ -4,13 +4,30 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Last AI — the last AI studio you'll need</title>
-<meta name="description" content="Last AI is a local-first AI studio for your own machine, built from three parts: the LastHarness harness, the LastEngine inference engine and the hf-dl downloader. No account, no cloud.">
+<meta name="description" content="Last AI is a local-first AI studio that works as a team: your assistant hands bigger goals to a department, whose lead splits them across workers and checks the result. Built from three parts — the LastHarness harness, the LastEngine inference engine and the hf-dl downloader. No account, no cloud.">
 <meta name="theme-color" content="#0b120e">
 <link rel="icon" href="assets/lastai.png">
 <link rel="preconnect" href="https://cdn.fontshare.com" crossorigin>
 <link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@700,800&f[]=switzer@400,500&display=swap">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap">
+<script>
+  // Paint the theme before the first frame: replay the stored palette, or the
+  // attribute a pinned choice names. theme.js takes over from here.
+  (function () {
+    try {
+      var root = document.documentElement;
+      var choice = localStorage.getItem("lastai-site-theme") || "auto";
+      if (choice !== "auto") { root.dataset.theme = choice; return; }
+      var saved = localStorage.getItem("lastai-site-vars");
+      if (!saved) return;
+      var theme = JSON.parse(saved);
+      for (var name in theme.vars) root.style.setProperty(name, theme.vars[name]);
+      root.style.colorScheme = theme.mode || "dark";
+    } catch (e) {}
+  })();
+</script>
 <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="themes.css">
 <script>
   document.documentElement.classList.add('motion');
   addEventListener('load', function () {
@@ -23,14 +40,36 @@
 <a class="skip" href="#main">Skip to content</a>
 
 <header class="masthead">
-  <a class="wordmark" href="./" aria-label="LastSoft, home">
-    <img src="assets/lastai-lockup-on-dark.svg" alt="Last AI" width="160" height="49">
+  <a class="wordmark" href="./" aria-label="Last AI, home">
+      <svg viewBox="0 0 208 64" role="img" aria-label="Last AI">
+        <rect x="8" y="18" width="38" height="38" rx="15" fill="var(--accent)"/>
+        <g transform="translate(2.4 -2) rotate(-8 27 37)" fill="var(--on-accent)">
+          <rect x="18.6" y="30.6" width="6" height="11" rx="3"/>
+          <rect x="30.1" y="31.4" width="4.6" height="10.2" rx="2.3"/>
+        </g>
+        <circle cx="49" cy="15" r="6" fill="var(--accent-2)"/>
+        <g transform="translate(70 12.57142857142857) scale(0.6785714285714286)">
+          <g fill="none" stroke="var(--ink)" stroke-width="8.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 8V64"/><circle cx="35" cy="47" r="15"/><path d="M50 32V64"/>
+            <path d="M88 39C88 34 83 32 77 32C69 32 65 36 65 40C65 44 69 46 77 47C85 48 89 50 89 54C89 59 84 62 77 62C70 62 66 59 65 55"/>
+            <path d="M110 16V51A13 13 0 0 0 123 64H126M101 32H125"/>
+          </g>
+          <g fill="none" stroke="var(--accent)" stroke-width="8.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M152 64L165.2 15A4 4 0 0 1 169.8 15L182 64M159 47H176"/><path d="M198 8V64"/>
+          </g>
+        </g>
+      </svg>
   </a>
   <nav class="masthead-nav" aria-label="Sections">
-    <a href="#assembly">What it's built from</a>
+    <a href="./" aria-current="page">Studio</a>
+    <a href="./#crew">The team</a>
     <a href="downloads.html">Download</a>
-    <a href="https://github.com/TheSyrianDev">GitHub</a>
+    <a href="https://github.com/TheSyrianDev/LastAI">Source</a>
   </nav>
+  <button class="theme-btn" type="button" data-theme-open aria-haspopup="dialog" aria-label="Theme">
+    <span class="theme-btn-swatch" data-theme-swatch aria-hidden="true"></span>
+    <span data-theme-label>Theme</span>
+  </button>
 </header>
 
 <main id="main">
@@ -39,14 +78,16 @@
     <div class="hero-copy">
       <h1 class="display" data-reveal>The last AI studio<br>you'll need.</h1>
       <p class="lede" data-reveal>
-        A desktop app and a terminal client that keep the conversation, the
-        memory, the tools and the money on your own machine. Last AI is built
-        from three parts that are each useful alone: a harness, an inference
-        engine and a model downloader. No account, no cloud.
+        A local-first AI studio that works as a team. Your assistant hands a
+        bigger goal to a department, whose lead splits it across workers, runs
+        what can run together and checks the result before you see it. The
+        conversation, the memory, the tools and the money stay on your machine.
+        Underneath: a harness, an inference engine and a model downloader, each
+        useful alone. No account, no cloud.
       </p>
       <div class="hero-actions" data-reveal>
         <a class="button" href="downloads.html">Download for your system</a>
-        <a class="link-arrow" href="#assembly">See what's inside</a>
+        <a class="link-arrow" href="#crew">See the team work</a>
       </div>
       <dl class="spec" data-reveal>
         <div><dt>Current</dt><dd>0.1.0-alpha.1</dd></div>
@@ -66,6 +107,57 @@
       </div>
       <figcaption>Fig. 1 — a goal moving through the team: core, departments, workers; the engine around them; models arriving from below.</figcaption>
     </figure>
+  </section>
+
+
+  <section class="crew" id="crew" aria-labelledby="crew-heading">
+    <h2 id="crew-heading" class="section-head" data-reveal>One goal, a team that works it</h2>
+    <p class="section-lede" data-reveal>
+      You talk to the assistant. Bigger work it hands to a <strong>department</strong>:
+      a named group of workers with a lead. The lead splits the goal into steps,
+      gives each step to a worker, and checks what comes back. The rest of the
+      product — memory, tools, spend — sits around that loop, and everything
+      below runs on your own machine.
+    </p>
+
+    <ol class="crew-steps">
+      <li data-reveal>
+        <h3>The lead plans</h3>
+        <p>The lead breaks the goal into steps, one per worker, with the files
+        and results each step needs. You approve the plan, edit it, or set the
+        autonomy so it goes ahead on its own and reports at milestones.</p>
+      </li>
+      <li data-reveal>
+        <h3>Workers run together</h3>
+        <p>Steps that do not depend on each other run at the same time, up to a
+        limit you choose, each on its own model or a shared one. Steps on the
+        same model are grouped so nothing is loaded twice for nothing.</p>
+      </li>
+      <li data-reveal>
+        <h3>Results come back checked</h3>
+        <p>The lead reads each result against its step. Small misses it fixes in
+        place; a real failure is retried, moved to another model, done by the
+        lead itself, or handed to another worker. What is still unresolved
+        reaches you with everything that was tried.</p>
+      </li>
+    </ol>
+
+    <dl class="crew-more">
+      <div data-reveal>
+        <dt>Nested</dt>
+        <p>A department can hold sub-departments. A sub-department is a step that
+        runs its own plan with its own lead, and its failure comes back as a
+        failed step — so the same checks apply at every depth, and a stuck team
+        cannot loop or run up cost unnoticed.</p>
+      </div>
+      <div data-reveal>
+        <dt>Extended</dt>
+        <p>A department is a Markdown file: name, lead, members, instructions. A
+        worker is one too, with its model, tools and memory slice. Write them by
+        hand, edit them in the app, or share a folder of them as a plugin. Skills
+        and MCP servers add procedures and tools under the same permission rules.</p>
+      </div>
+    </dl>
   </section>
 
   <section class="parts" aria-labelledby="parts-heading">
@@ -166,7 +258,24 @@
 
 <footer class="foot">
   <div class="foot-brand">
-    <img src="assets/lastai-lockup-on-dark.svg" alt="Last AI" width="132" height="41">
+      <svg viewBox="0 0 208 64" role="img" aria-label="Last AI">
+        <rect x="8" y="18" width="38" height="38" rx="15" fill="var(--accent)"/>
+        <g transform="translate(2.4 -2) rotate(-8 27 37)" fill="var(--on-accent)">
+          <rect x="18.6" y="30.6" width="6" height="11" rx="3"/>
+          <rect x="30.1" y="31.4" width="4.6" height="10.2" rx="2.3"/>
+        </g>
+        <circle cx="49" cy="15" r="6" fill="var(--accent-2)"/>
+        <g transform="translate(70 12.57142857142857) scale(0.6785714285714286)">
+          <g fill="none" stroke="var(--ink)" stroke-width="8.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 8V64"/><circle cx="35" cy="47" r="15"/><path d="M50 32V64"/>
+            <path d="M88 39C88 34 83 32 77 32C69 32 65 36 65 40C65 44 69 46 77 47C85 48 89 50 89 54C89 59 84 62 77 62C70 62 66 59 65 55"/>
+            <path d="M110 16V51A13 13 0 0 0 123 64H126M101 32H125"/>
+          </g>
+          <g fill="none" stroke="var(--accent)" stroke-width="8.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M152 64L165.2 15A4 4 0 0 1 169.8 15L182 64M159 47H176"/><path d="M198 8V64"/>
+          </g>
+        </g>
+      </svg>
     <p>Written and maintained by <a href="https://github.com/TheSyrianDev">TheSyrianDev</a>.</p>
   </div>
   <nav class="foot-nav" aria-label="Projects and licence">
@@ -187,5 +296,7 @@
 </script>
 <script src="vendor/motion.js"></script>
 <script type="module" src="main.js"></script>
+<script src="themes.js"></script>
+<script type="module" src="theme.js"></script>
 </body>
 </html>
