@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>hf-dl — documentation</title>
-<meta name="description" content="hf-dl documented: download models and datasets from the Hugging Face Hub with resumable segmented transfers, verification, a background queue and token handling.">
+<title>hf-dl — the model downloader — documentation</title>
+<meta name="description" content="hf-dl documented: the model downloader for the Hugging Face Hub, ModelScope and (opt-in) Pirate Face — resumable segmented transfers, verification, a background queue and token handling.">
 <meta name="theme-color" content="#0b120e">
 <link rel="icon" href="../assets/lastai.png">
 <link rel="preconnect" href="https://cdn.fontshare.com" crossorigin>
@@ -72,11 +72,13 @@
 
   <main class="doc" id="main">
     <p class="eyebrow">Part hf-dl · v0.4.0-rc.1</p>
-    <h1>hf-dl</h1>
+    <h1>hf-dl, the model downloader</h1>
     <p class="lede">
-      A Hugging Face downloader in Rust. Segmented, resumable transfers with
-      verification, a queue that keeps running after you close the terminal, and
-      no opinion about what you do with the files.
+      A downloader in Rust for models and datasets, wherever they live: the
+      Hugging Face Hub, ModelScope, and — opt-in, over BitTorrent — Pirate Face.
+      Segmented, resumable transfers with verification, a queue that keeps
+      running after you close the terminal, and no opinion about what you do
+      with the files.
     </p>
 
     <div class="note">
@@ -102,6 +104,30 @@ hfd download &lt;repo&gt; --dry-run        # resolve the files, print the plan, 
       safest way to see how much a repo would cost you.
     </p>
 
+    <h2>Three sources</h2>
+    <p>
+      Hugging Face is the default. The other two are chosen explicitly with
+      <code>--source</code>, and there is no silent fallback between them, so a
+      missing model on one hub never turns into a different download.
+    </p>
+    <table>
+      <thead><tr><th>Source</th><th>How it fetches</th></tr></thead>
+      <tbody>
+        <tr><td><code>hf</code> <span class="muted">(default)</span></td><td>The Hugging Face Hub API, with the HTTP or Xet engine, into the Hub-style cache or a plain directory.</td></tr>
+        <tr><td><code>modelscope</code></td><td>ModelScope's listing API and its per-file HTTPS endpoint. Each file is checked against the sha256 the hub published; the revision defaults to <code>master</code>.</td></tr>
+        <tr><td><code>pirateface</code></td><td>A listing lookup plus a torrent fetched with a user-installed <code>aria2c</code>. Seeding is switched off. Needs <code>--local-dir</code>.</td></tr>
+      </tbody>
+    </table>
+<pre><code>hfd download Qwen/Qwen3-0.6B --source modelscope --local-dir ./model
+hfd download AI-ModelScope/ShareGPT-4o --source modelscope --type dataset --dry-run</code></pre>
+    <p>
+      <code>MODELSCOPE_API</code> points the ModelScope source at a mirror, and
+      <code>MODELSCOPE_API_TOKEN</code> (or <code>MODELSCOPE_TOKEN</code>) is
+      sent for private repositories — never to a host other than ModelScope's
+      own. A ModelScope file with no published digest cannot be verified, so it
+      goes to <code>--local-dir</code> but not into the cache.
+    </p>
+
     <h2>Flags that matter</h2>
     <table>
       <tbody>
@@ -113,7 +139,8 @@ hfd download &lt;repo&gt; --dry-run        # resolve the files, print the plan, 
         <tr><td><code>--verify auto|always|never</code></td><td>Size and hash checking. <code>auto</code> is the default.</td></tr>
         <tr><td><code>--max-workers</code>, <code>--connections</code></td><td>How many files, how many connections per file.</td></tr>
         <tr><td><code>--max-speed</code></td><td>For example <code>5M</code>, when you share the line.</td></tr>
-        <tr><td><code>--engine auto|http|xet</code></td><td>Transfer engine. HTTP is the default.</td></tr>
+        <tr><td><code>--source hf|modelscope|pirateface</code></td><td>Which hub the bytes come from. Hugging Face by default.</td></tr>
+        <tr><td><code>--engine auto|http|xet</code></td><td>Transfer engine on the Hugging Face source. HTTP is the default.</td></tr>
         <tr><td><code>--json</code>, <code>--quiet</code></td><td>For scripts.</td></tr>
       </tbody>
     </table>

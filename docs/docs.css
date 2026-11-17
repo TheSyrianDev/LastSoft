@@ -235,6 +235,8 @@
 
 .doc .note p:last-child { margin-bottom: 0; }
 
+.doc .muted { color: var(--muted); }
+
 .doc .pager {
   display: flex;
   justify-content: space-between;
