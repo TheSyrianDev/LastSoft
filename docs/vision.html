@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The vision — Last AI suite documentation</title>
+<meta name="description" content="Where the Last AI suite is going: a computer that runs capable AI for one person, with the parts that make it work owned by that person, and nothing rented.">
+<meta name="theme-color" content="#0b120e">
+<link rel="icon" href="../assets/lastai.png">
+<link rel="preconnect" href="https://cdn.fontshare.com" crossorigin>
+<link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@700,800&f[]=switzer@400,500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap">
+<script>
+  (function () {
+    try {
+      var root = document.documentElement;
+      var choice = localStorage.getItem("lastai-site-theme") || "auto";
+      if (choice !== "auto") { root.dataset.theme = choice; return; }
+      var saved = localStorage.getItem("lastai-site-vars");
+      if (!saved) return;
+      var theme = JSON.parse(saved);
+      for (var name in theme.vars) root.style.setProperty(name, theme.vars[name]);
+      root.style.colorScheme = theme.mode || "dark";
+    } catch (e) {}
+  })();
+</script>
+<link rel="stylesheet" href="../style.css">
+<link rel="stylesheet" href="../themes.css">
+<link rel="stylesheet" href="docs.css">
+</head>
+<body>
+
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="doc-top">
+  <a class="doc-brand" href="../">Last AI <span>Documentation</span></a>
+  <nav class="doc-nav" aria-label="Documentation">
+    <a href="./">Overview</a>
+    <a href="lastai.html">Last AI</a>
+    <a href="harness.html">Harness</a>
+    <a href="engine.html">Engine</a>
+    <a href="hf-dl.html">hf-dl</a>
+    <a href="vision.html" aria-current="page">Vision</a>
+  </nav>
+  <button class="theme-btn" type="button" data-theme-open aria-haspopup="dialog" aria-label="Theme">
+    <span class="theme-btn-swatch" data-theme-swatch aria-hidden="true"></span>
+    <span data-theme-label>Theme</span>
+  </button>
+</header>
+
+<div class="doc-shell">
+  <aside class="doc-side">
+    <h2>The suite</h2>
+    <ul>
+      <li><a href="./">Overview</a></li>
+      <li><a href="vision.html" aria-current="page">Vision</a></li>
+    </ul>
+    <h2>The parts</h2>
+    <ul>
+      <li><a href="lastai.html">Last AI <code>LAI</code></a></li>
+      <li><a href="harness.html">LastHarness <code>LH</code></a></li>
+      <li><a href="engine.html">LastEngine <code>LE</code></a></li>
+      <li><a href="hf-dl.html">hf-dl</a></li>
+    </ul>
+    <h2>Elsewhere</h2>
+    <ul>
+      <li><a href="../">Last AI site</a></li>
+      <li><a href="../downloads.html">Downloads</a></li>
+      <li><a href="https://github.com/TheSyrianDev">GitHub</a></li>
+    </ul>
+  </aside>
+
+  <main class="doc" id="main">
+    <p class="eyebrow">The vision</p>
+    <h1>The last AI you'll need</h1>
+    <p class="lede">
+      The end state is not a bigger product. It is a computer that runs capable
+      AI for one person — for their work, their notes, their files, their
+      projects — with every part that makes it work owned by that person and
+      nothing rented by the minute.
+    </p>
+
+    <h2>The whole stack, on your desk</h2>
+    <p>
+      Today the studio borrows both ends of the stack: models are fetched with
+      someone else's tool and inference runs in someone else's engine. The
+      finished picture has all four parts your own — the downloader pulls the
+      weights, the engine runs them, the harness runs the turns, the studio is
+      where you work. Four repositories, one install, no service in the middle.
+    </p>
+    <table>
+      <thead><tr><th>Then</th><th>Now</th></tr></thead>
+      <tbody>
+        <tr><td>A model is a file on your disk that the engine you shipped knows how to run.</td><td>hf-dl fetches it; a llama.cpp-family server you already run serves it.</td></tr>
+        <tr><td>The engine that ships with the studio is the same engine in the repository, on CUDA, Vulkan and Metal.</td><td>LastEngine runs its own server on NVIDIA hardware, measured on one card.</td></tr>
+        <tr><td>A department of workers plans a real goal over your files and finishes it while you are away.</td><td>The team loop exists; autonomy stops at approvals you set.</td></tr>
+        <tr><td>Everything you taught it survives a new machine in one folder you can copy.</td><td>Memory, rules, roles and departments export and import.</td></tr>
+        <tr><td>One install works on Linux, Windows and macOS, signed and updated honestly.</td><td>Linux and Windows are tested; macOS is early alpha; nothing is signed.</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Five things that will stay true</h2>
+    <ol>
+      <li>
+        <strong>Your machine does the work.</strong> Loopback is the bus. The
+        only network calls are the ones a request you made implies — a provider
+        you added, a download you started, a search you asked for.
+      </li>
+      <li>
+        <strong>No account, ever.</strong> Not a free one you signed into, not a
+        key you cannot see, not a sync you cannot turn off. If a feature needs a
+        server, it says so before you enable it.
+      </li>
+      <li>
+        <strong>The parts stand alone.</strong> Somebody should be able to use
+        hf-dl and never hear of the studio; somebody should run the harness
+        against their own server and never run the engine. A bundle that only
+        works as a bundle is a lock, and this is not that.
+      </li>
+      <li>
+        <strong>You can read what it knows.</strong> Memory is Markdown, roles
+        are Markdown, looks are a folder with a TOML file. Anything the machine
+        concluded about you is a file you can open, edit, or delete — and the
+        index rebuilds from the files, not the other way round.
+      </li>
+      <li>
+        <strong>Honest about the state.</strong> Every README names the version
+        and the gaps. No benchmarks we did not run, no screenshots we did not
+        take, no "production ready" on alphaware.
+      </li>
+    </ol>
+
+    <h2>How work changes when the assistant is local</h2>
+    <p>
+      The interesting shift is not that the model runs near you. It is that the
+      assistant can hold the whole of your work: the repository, the notes, the
+      half-finished design, the three-month-old decision, the machine's actual
+      memory ceiling. A hosted assistant sees what you paste. A local one can be
+      given a folder and a permission rule.
+    </p>
+    <p>
+      So the studio is built around a team rather than a chat box: a goal goes to
+      a department, a plan comes back, workers run, results are checked, and you
+      get the outcome with the attempts attached. The model stops being an
+      oracle you consult and becomes a colleague with a desk in your machine —
+      one that forgets nothing you told it to keep and does nothing you did not
+      allow.
+    </p>
+
+    <h2>What "done" looks like</h2>
+    <ul>
+      <li>One command on a clean machine installs the studio, and it starts at login without root.</li>
+      <li>A model is downloaded, verified, registered and answering — all from inside the app.</li>
+      <li>A department finishes a multi-step goal over a real folder, unattended, inside the spend and permission limits you set.</li>
+      <li>The same memory, rules and team move to a new laptop by copying one directory.</li>
+      <li>Nothing in the UI requires a login, a telemetry ping, or an internet connection that you did not ask for.</li>
+      <li>The three engines — CUDA, Vulkan, Metal — each measured, each with numbers in the repository.</li>
+    </ul>
+
+    <h2>What it will never be</h2>
+    <ul>
+      <li>A hosted service with a subscription in front of it.</li>
+      <li>A wrapper that forwards your files to an API and calls it local.</li>
+      <li>A platform with a plugin store, an account tier, or a growth loop.</li>
+      <li>Closed. Source-available now, and the permissive bits — <code>hfd-core</code> — stay permissive.</li>
+    </ul>
+
+    <div class="note">
+      <p>
+        One developer, in the open, pre-release. The vision is the direction of
+        travel, not a shipping promise; the version on each page is what exists
+        today.
+      </p>
+    </div>
+
+    <div class="pager">
+      <a href="./">&larr; Overview</a>
+      <a href="../downloads.html">Downloads &rarr;</a>
+    </div>
+  </main>
+</div>
+
+<footer class="doc-foot">
+  <span>Written and maintained by <a href="https://github.com/TheSyrianDev">TheSyrianDev</a>.</span>
+  <span><a href="../">Last AI site</a> · <a href="https://github.com/TheSyrianDev/LastAI">Source</a></span>
+</footer>
+
+<script src="../themes.js"></script>
+<script type="module" src="../theme.js"></script>
+</body>
+</html>

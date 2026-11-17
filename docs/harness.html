@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LastHarness — documentation</title>
+<meta name="description" content="LastHarness documented: the core, the clients, the provider layer, tool permissions, memory, the team loop and the spend ledger — with no downloader and no inference engine of its own.">
+<meta name="theme-color" content="#0b120e">
+<link rel="icon" href="../assets/lastai.png">
+<link rel="preconnect" href="https://cdn.fontshare.com" crossorigin>
+<link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@700,800&f[]=switzer@400,500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap">
+<script>
+  (function () {
+    try {
+      var root = document.documentElement;
+      var choice = localStorage.getItem("lastai-site-theme") || "auto";
+      if (choice !== "auto") { root.dataset.theme = choice; return; }
+      var saved = localStorage.getItem("lastai-site-vars");
+      if (!saved) return;
+      var theme = JSON.parse(saved);
+      for (var name in theme.vars) root.style.setProperty(name, theme.vars[name]);
+      root.style.colorScheme = theme.mode || "dark";
+    } catch (e) {}
+  })();
+</script>
+<link rel="stylesheet" href="../style.css">
+<link rel="stylesheet" href="../themes.css">
+<link rel="stylesheet" href="docs.css">
+</head>
+<body>
+
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="doc-top">
+  <a class="doc-brand" href="../">Last AI <span>Documentation</span></a>
+  <nav class="doc-nav" aria-label="Documentation">
+    <a href="./">Overview</a>
+    <a href="lastai.html">Last AI</a>
+    <a href="harness.html" aria-current="page">Harness</a>
+    <a href="engine.html">Engine</a>
+    <a href="hf-dl.html">hf-dl</a>
+    <a href="vision.html">Vision</a>
+  </nav>
+  <button class="theme-btn" type="button" data-theme-open aria-haspopup="dialog" aria-label="Theme">
+    <span class="theme-btn-swatch" data-theme-swatch aria-hidden="true"></span>
+    <span data-theme-label>Theme</span>
+  </button>
+</header>
+
+<div class="doc-shell">
+  <aside class="doc-side">
+    <h2>The suite</h2>
+    <ul>
+      <li><a href="./">Overview</a></li>
+      <li><a href="vision.html">Vision</a></li>
+    </ul>
+    <h2>The parts</h2>
+    <ul>
+      <li><a href="lastai.html">Last AI <code>LAI</code></a></li>
+      <li><a href="harness.html" aria-current="page">LastHarness <code>LH</code></a></li>
+      <li><a href="engine.html">LastEngine <code>LE</code></a></li>
+      <li><a href="hf-dl.html">hf-dl</a></li>
+    </ul>
+    <h2>Elsewhere</h2>
+    <ul>
+      <li><a href="../">Last AI site</a></li>
+      <li><a href="../downloads.html">Downloads</a></li>
+      <li><a href="https://github.com/TheSyrianDev">GitHub</a></li>
+    </ul>
+  </aside>
+
+  <main class="doc" id="main">
+    <p class="eyebrow">Part LH · the harness</p>
+    <h1>LastHarness</h1>
+    <p class="lede">
+      The part that runs the turn. Give it a model and a goal and it loops:
+      build the prompt, call the provider, run the tools the permission rule
+      allows, write what is worth keeping, stop when the goal is met.
+    </p>
+
+    <div class="note">
+      <p>
+        LastHarness is the harness inside Last AI today, published as its own
+        repository: <code>main</code> is the studio on its own, <code>omarchy</code>
+        is the edition that follows the desktop's theme. It is not a separate
+        download.
+      </p>
+    </div>
+
+    <h2>What is in it</h2>
+    <table>
+      <thead><tr><th>Piece</th><th>Responsibility</th></tr></thead>
+      <tbody>
+        <tr><td>Core</td><td>State, the turn loop, the HTTP API on loopback, the token the clients present.</td></tr>
+        <tr><td>Clients</td><td>A terminal app, a desktop app, paired browser pages and messaging channels — all thin.</td></tr>
+        <tr><td>Provider layer</td><td>Local runtimes and cloud APIs behind one shape. Keys by reference, never stored in config.</td></tr>
+        <tr><td>Tools</td><td>File reads and writes, shell, search, MCP servers, each behind a tiered permission rule.</td></tr>
+        <tr><td>Memory</td><td>Markdown notes plus a database index. Files are the truth; the index is a cache.</td></tr>
+        <tr><td>Learning</td><td>Rules, style and skills as separate prompt blocks, versioned, logged when applied.</td></tr>
+        <tr><td>Team</td><td>Departments and role workers as Markdown, the plan/run/check loop, nesting, autonomy.</td></tr>
+        <tr><td>Spend</td><td>A ledger of what each provider call cost, priced from your own table.</td></tr>
+      </tbody>
+    </table>
+
+    <h2>What is deliberately not in it</h2>
+    <ul>
+      <li><strong>No downloader.</strong> It does not fetch models; hf-dl does that, and the studio calls it.</li>
+      <li><strong>No inference engine.</strong> It talks to a server you point it at. Today that is llama-swap, llama.cpp, Ollama, LM Studio, or a cloud API.</li>
+      <li><strong>No account, no relay, no sync.</strong> The only network calls are the ones a request implies.</li>
+    </ul>
+    <p>
+      Because of that, the harness runs against <em>any</em> OpenAI-compatible
+      server. If you already serve a model with something else, the harness is
+      the whole product you need.
+    </p>
+
+    <h2>The turn loop</h2>
+    <ol>
+      <li><strong>Prompt assembly.</strong> Base prompt first, then the learned blocks (rules, style, skills) in order, then the memory this task needs. The base prompt is not rewritten; learned text is appended and every version is kept.</li>
+      <li><strong>Provider call.</strong> One request per step, to the model the worker is assigned. Streaming to whichever client asked.</li>
+      <li><strong>Tool gate.</strong> Every tool call passes the rule for its tier — free read, ask-once write, always-ask for anything that leaves the machine or destroys data.</li>
+      <li><strong>Effects and spend.</strong> Tool results are appended; provider cost lands in the ledger; the machine lock is taken when a job needs the GPU alone.</li>
+      <li><strong>Check and continue.</strong> The step is checked against its goal. Failures retry, move to another model, get done by the lead, or come back to you with the attempts.</li>
+    </ol>
+
+    <h2>Using it</h2>
+    <p>
+      Build the core and the terminal client without the desktop app:
+    </p>
+<pre><code>cargo build --release -p lh-core -p lh-tui
+
+./target/release/la setup
+./target/release/lastaid      # 127.0.0.1:7842, token in $XDG_RUNTIME_DIR/lastai/token
+./target/release/la</code></pre>
+    <p>
+      Point a client at another core with <code>--url</code> and
+      <code>--token-file</code>. The core takes flags that override
+      <code>config.toml</code>, which is how a test instance runs on a temp store:
+    </p>
+<pre><code>scripts/smoke-headless.sh      # starts lhd on a temp store, exercises the HTTP API</code></pre>
+
+    <h2>Prompt blocks, in order</h2>
+    <table>
+      <tbody>
+        <tr><td>Base</td><td>The harness's own instructions for the loop. Never edited by learning.</td></tr>
+        <tr><td>Rules</td><td>Habits you approved. Numbered, removable one at a time.</td></tr>
+        <tr><td>Style</td><td>How you want answers written. A separate block, not a rewrite of the base.</td></tr>
+        <tr><td>Skills</td><td>Procedures the worker can follow, loaded on demand.</td></tr>
+        <tr><td>Memory</td><td>Notes relevant to this task, retrieved from Markdown files.</td></tr>
+      </tbody>
+    </table>
+    <p>
+      Everything applied without asking is recorded in the activity log, so an
+      unexpected answer can be traced to the block that shaped it.
+    </p>
+
+    <h2>Boundaries worth stating</h2>
+    <ul>
+      <li>The core binds to loopback only. Remote access is a paired browser or a channel you switched on, not an open port.</li>
+      <li>MCP servers do nothing until you approve them; a project folder may only bring its own if you <code>lh trust</code> it.</li>
+      <li>Team workers can share a model or split across models, and steps on one model are grouped so nothing loads twice for nothing.</li>
+    </ul>
+
+    <div class="pager">
+      <a href="lastai.html">&larr; Last AI</a>
+      <a href="engine.html">Next: LastEngine &rarr;</a>
+    </div>
+  </main>
+</div>
+
+<footer class="doc-foot">
+  <span>Written and maintained by <a href="https://github.com/TheSyrianDev">TheSyrianDev</a>.</span>
+  <span><a href="../">Last AI site</a> · <a href="https://github.com/TheSyrianDev/LastHarness">Source</a></span>
+</footer>
+
+<script src="../themes.js"></script>
+<script type="module" src="../theme.js"></script>
+</body>
+</html>

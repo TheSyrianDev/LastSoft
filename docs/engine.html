@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LastEngine — documentation</title>
+<meta name="description" content="LastEngine documented: a clean-room Rust inference engine with one backend trait, a hardware probe, an OpenAI-compatible chat server with stats, and benchmarks that decide what stays.">
+<meta name="theme-color" content="#0b120e">
+<link rel="icon" href="../assets/lastai.png">
+<link rel="preconnect" href="https://cdn.fontshare.com" crossorigin>
+<link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@700,800&f[]=switzer@400,500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap">
+<script>
+  (function () {
+    try {
+      var root = document.documentElement;
+      var choice = localStorage.getItem("lastai-site-theme") || "auto";
+      if (choice !== "auto") { root.dataset.theme = choice; return; }
+      var saved = localStorage.getItem("lastai-site-vars");
+      if (!saved) return;
+      var theme = JSON.parse(saved);
+      for (var name in theme.vars) root.style.setProperty(name, theme.vars[name]);
+      root.style.colorScheme = theme.mode || "dark";
+    } catch (e) {}
+  })();
+</script>
+<link rel="stylesheet" href="../style.css">
+<link rel="stylesheet" href="../themes.css">
+<link rel="stylesheet" href="docs.css">
+</head>
+<body>
+
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="doc-top">
+  <a class="doc-brand" href="../">Last AI <span>Documentation</span></a>
+  <nav class="doc-nav" aria-label="Documentation">
+    <a href="./">Overview</a>
+    <a href="lastai.html">Last AI</a>
+    <a href="harness.html">Harness</a>
+    <a href="engine.html" aria-current="page">Engine</a>
+    <a href="hf-dl.html">hf-dl</a>
+    <a href="vision.html">Vision</a>
+  </nav>
+  <button class="theme-btn" type="button" data-theme-open aria-haspopup="dialog" aria-label="Theme">
+    <span class="theme-btn-swatch" data-theme-swatch aria-hidden="true"></span>
+    <span data-theme-label>Theme</span>
+  </button>
+</header>
+
+<div class="doc-shell">
+  <aside class="doc-side">
+    <h2>The suite</h2>
+    <ul>
+      <li><a href="./">Overview</a></li>
+      <li><a href="vision.html">Vision</a></li>
+    </ul>
+    <h2>The parts</h2>
+    <ul>
+      <li><a href="lastai.html">Last AI <code>LAI</code></a></li>
+      <li><a href="harness.html">LastHarness <code>LH</code></a></li>
+      <li><a href="engine.html" aria-current="page">LastEngine <code>LE</code></a></li>
+      <li><a href="hf-dl.html">hf-dl</a></li>
+    </ul>
+    <h2>Elsewhere</h2>
+    <ul>
+      <li><a href="../">Last AI site</a></li>
+      <li><a href="../downloads.html">Downloads</a></li>
+      <li><a href="https://github.com/TheSyrianDev">GitHub</a></li>
+    </ul>
+  </aside>
+
+  <main class="doc" id="main">
+    <p class="eyebrow">Part LE · v0.1.0, in development</p>
+    <h1>LastEngine</h1>
+    <p class="lede">
+      Inference without a framework under it. Rust, a clean room, and a target
+      that is deliberately small: mixture-of-experts models on the kind of GPU
+      most people actually have — a 4&nbsp;GB laptop card first.
+    </p>
+
+    <div class="note">
+      <p>
+        Measured on Linux x86_64 with an NVIDIA card (sm_86, RTX 3050 Laptop).
+        The Windows build compiles in CI but has not run a model on a Windows
+        GPU. Treat it as an engine to watch, not the engine behind the studio
+        yet — Last AI talks to llama.cpp-family servers today.
+      </p>
+    </div>
+
+    <h2>One trait, several backends</h2>
+    <p>
+      Everything is written against a single backend trait, so the rest of the
+      engine — model loading, sampling, the server, benchmarks — never learns
+      which hardware it is on. At startup the engine probes the machine and
+      picks the strongest backend that can actually work.
+    </p>
+    <table>
+      <thead><tr><th>Backend</th><th>State</th></tr></thead>
+      <tbody>
+        <tr><td>CUDA</td><td>First backend. Kernels are compiled from source at runtime through NVRTC, so the build follows the card.</td></tr>
+        <tr><td>CPU</td><td>Second backend, and the fallback when no GPU path works.</td></tr>
+        <tr><td>Vulkan</td><td>Planned, from the same kernels through GLSL to SPIR-V. Reaches AMD and Intel cards.</td></tr>
+        <tr><td>ROCm</td><td>Planned, alongside Vulkan for AMD.</td></tr>
+        <tr><td>Metal</td><td>Planned, for Apple silicon.</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Probe first, then decide</h2>
+<pre><code>lastengine probe          # one JSON object: GPU, VRAM, RAM, backends
+lastengine probe --json   # the same, explicitly</code></pre>
+    <p>
+      The probe is the honest part of the design: before a model is loaded the
+      engine knows how much memory it has, what the GPU reports, and which
+      backends respond. The studio uses the same answer to tell you whether a
+      model <em>fits</em>, is <em>tight</em>, or is <em>too big</em>. On Windows
+      the RAM fields come back <code>null</code> today.
+    </p>
+
+    <h2>The server speaks llama.cpp's dialect</h2>
+    <p>
+      The engine runs as a server, so anything that speaks OpenAI chat to a local
+      server can use it — including the harness. Responses carry a
+      llama.cpp-style <code>timings</code> object, and there are endpoints for
+      watching work as it happens:
+    </p>
+    <table>
+      <tbody>
+        <tr><td><code>GET /stats</code></td><td>Model info, uptime, active requests, totals including prefill and decode tok/s, average time to first token, last request.</td></tr>
+        <tr><td><code>GET /stats/requests?limit=N</code></td><td>The last 200 requests.</td></tr>
+        <tr><td><code>timings</code></td><td>On every chat response: <code>prompt_n</code>/<code>prompt_ms</code>/<code>prompt_per_second</code>, the same for predicted tokens, <code>cache_n</code>, <code>time_to_first_token_ms</code>.</td></tr>
+      </tbody>
+    </table>
+
+    <h2>The rules that keep it honest</h2>
+    <ul>
+      <li><strong>Clean room.</strong> No code from the previous engine tree; that tree is kept only as a benchmark baseline binary.</li>
+      <li><strong>Ideas have sources.</strong> Anything borrowed conceptually comes from a README, a paper or a file-format spec, and the module's header comment says which.</li>
+      <li><strong>Benchmark everything, drop what loses.</strong> A technique stays only if it wins on this hardware; the results live in the repository's benchmark notes.</li>
+      <li><strong>Licences travel.</strong> Any third-party code keeps its notice and is listed in <code>NOTICE</code>.</li>
+    </ul>
+
+    <h2>Where it goes next</h2>
+    <ol>
+      <li>Batched decode, because the backend lock serializes requests today — one generation at a time.</li>
+      <li>Expert caching for MoE models, which is the whole reason for the small-card target.</li>
+      <li>Vulkan, then Metal, behind the same trait.</li>
+      <li>An embeddable library crate next to the server, so the harness can link the engine instead of starting it.</li>
+    </ol>
+
+    <div class="pager">
+      <a href="harness.html">&larr; LastHarness</a>
+      <a href="hf-dl.html">Next: hf-dl &rarr;</a>
+    </div>
+  </main>
+</div>
+
+<footer class="doc-foot">
+  <span>Written and maintained by <a href="https://github.com/TheSyrianDev">TheSyrianDev</a>.</span>
+  <span><a href="../">Last AI site</a> · <a href="https://github.com/TheSyrianDev/LastEngine">Source</a></span>
+</footer>
+
+<script src="../themes.js"></script>
+<script type="module" src="../theme.js"></script>
+</body>
+</html>

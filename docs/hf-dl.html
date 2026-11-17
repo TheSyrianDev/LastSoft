@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>hf-dl — documentation</title>
+<meta name="description" content="hf-dl documented: download models and datasets from the Hugging Face Hub with resumable segmented transfers, verification, a background queue and token handling.">
+<meta name="theme-color" content="#0b120e">
+<link rel="icon" href="../assets/lastai.png">
+<link rel="preconnect" href="https://cdn.fontshare.com" crossorigin>
+<link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@700,800&f[]=switzer@400,500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap">
+<script>
+  (function () {
+    try {
+      var root = document.documentElement;
+      var choice = localStorage.getItem("lastai-site-theme") || "auto";
+      if (choice !== "auto") { root.dataset.theme = choice; return; }
+      var saved = localStorage.getItem("lastai-site-vars");
+      if (!saved) return;
+      var theme = JSON.parse(saved);
+      for (var name in theme.vars) root.style.setProperty(name, theme.vars[name]);
+      root.style.colorScheme = theme.mode || "dark";
+    } catch (e) {}
+  })();
+</script>
+<link rel="stylesheet" href="../style.css">
+<link rel="stylesheet" href="../themes.css">
+<link rel="stylesheet" href="docs.css">
+</head>
+<body>
+
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="doc-top">
+  <a class="doc-brand" href="../">Last AI <span>Documentation</span></a>
+  <nav class="doc-nav" aria-label="Documentation">
+    <a href="./">Overview</a>
+    <a href="lastai.html">Last AI</a>
+    <a href="harness.html">Harness</a>
+    <a href="engine.html">Engine</a>
+    <a href="hf-dl.html" aria-current="page">hf-dl</a>
+    <a href="vision.html">Vision</a>
+  </nav>
+  <button class="theme-btn" type="button" data-theme-open aria-haspopup="dialog" aria-label="Theme">
+    <span class="theme-btn-swatch" data-theme-swatch aria-hidden="true"></span>
+    <span data-theme-label>Theme</span>
+  </button>
+</header>
+
+<div class="doc-shell">
+  <aside class="doc-side">
+    <h2>The suite</h2>
+    <ul>
+      <li><a href="./">Overview</a></li>
+      <li><a href="vision.html">Vision</a></li>
+    </ul>
+    <h2>The parts</h2>
+    <ul>
+      <li><a href="lastai.html">Last AI <code>LAI</code></a></li>
+      <li><a href="harness.html">LastHarness <code>LH</code></a></li>
+      <li><a href="engine.html">LastEngine <code>LE</code></a></li>
+      <li><a href="hf-dl.html" aria-current="page">hf-dl</a></li>
+    </ul>
+    <h2>Elsewhere</h2>
+    <ul>
+      <li><a href="../">Last AI site</a></li>
+      <li><a href="../downloads.html">Downloads</a></li>
+      <li><a href="https://github.com/TheSyrianDev">GitHub</a></li>
+    </ul>
+  </aside>
+
+  <main class="doc" id="main">
+    <p class="eyebrow">Part hf-dl · v0.4.0-rc.1</p>
+    <h1>hf-dl</h1>
+    <p class="lede">
+      A Hugging Face downloader in Rust. Segmented, resumable transfers with
+      verification, a queue that keeps running after you close the terminal, and
+      no opinion about what you do with the files.
+    </p>
+
+    <div class="note">
+      <p>Beta. It has tests and it works, but it has had little use outside the author's machine.</p>
+    </div>
+
+    <h2>Install</h2>
+<pre><code>cargo install --path crates/hfd-cli      # needs Rust 1.88 or newer</code></pre>
+    <p>
+      Two binaries are installed, <code>hfd</code> and <code>hf-dl</code>. They
+      are the same program.
+    </p>
+
+    <h2>Download something</h2>
+<pre><code>hfd download &lt;repo-id | hf:// URI | web URL&gt; [paths...]
+
+hfd download Qwen/Qwen3-0.6B --include "*.safetensors" --local-dir ./model
+hfd download &lt;repo&gt; &lt;file.gguf&gt; --local-dir ./models --flat
+hfd download &lt;repo&gt; --dry-run        # resolve the files, print the plan, fetch nothing</code></pre>
+    <p>
+      <code>--flat</code> puts files by basename with no subfolders, which is
+      what a llama-swap folder usually wants. <code>--dry-run</code> is the
+      safest way to see how much a repo would cost you.
+    </p>
+
+    <h2>Flags that matter</h2>
+    <table>
+      <tbody>
+        <tr><td><code>--type</code></td><td><code>model</code>, <code>dataset</code> or <code>space</code>.</td></tr>
+        <tr><td><code>--revision</code></td><td>A branch, tag or commit.</td></tr>
+        <tr><td><code>--include</code> / <code>--exclude</code></td><td>Globs, repeatable. The usual way to skip 30&nbsp;GB of safetensors you do not need.</td></tr>
+        <tr><td><code>--cache-dir</code> / <code>--local-dir</code></td><td>The Hub-style cache, or a plain directory you own.</td></tr>
+        <tr><td><code>--force-download</code></td><td>Fetch again even if the file looks complete.</td></tr>
+        <tr><td><code>--verify auto|always|never</code></td><td>Size and hash checking. <code>auto</code> is the default.</td></tr>
+        <tr><td><code>--max-workers</code>, <code>--connections</code></td><td>How many files, how many connections per file.</td></tr>
+        <tr><td><code>--max-speed</code></td><td>For example <code>5M</code>, when you share the line.</td></tr>
+        <tr><td><code>--engine auto|http|xet</code></td><td>Transfer engine. HTTP is the default.</td></tr>
+        <tr><td><code>--json</code>, <code>--quiet</code></td><td>For scripts.</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Transfers that survive</h2>
+    <p>
+      Downloads are segmented and resumable: a transfer interrupted by sleep, a
+      dropped connection or <kbd>Ctrl</kbd>+<kbd>C</kbd> picks up where it
+      stopped instead of starting over. Verification compares what arrived with
+      what the Hub says the file is.
+    </p>
+    <p>
+      Xet is opt-in. With <code>--engine auto</code> or <code>xet</code> the
+      downloader tries it, and if it stalls it falls back to HTTP and skips Xet
+      on that host for 24 hours. You do not have to think about it.
+    </p>
+
+    <h2>Leave it running</h2>
+<pre><code>hfd download &lt;repo&gt; --detach         # enqueue and return immediately
+hfd queue list | show &lt;id&gt; | pause &lt;id&gt; | resume &lt;id&gt; | cancel &lt;id&gt; | clear
+hfd daemon                           # run the daemon in the foreground</code></pre>
+    <p>
+      The queue is persistent, so a 60&nbsp;GB pull can be paused in the evening
+      and resumed the next day without re-reading the plan.
+    </p>
+
+    <h2>Tokens</h2>
+<pre><code>hfd auth login        # paste a token, or use the browser device flow
+hfd auth whoami
+hfd auth list
+hfd auth token        # prints the active token to stdout
+hfd auth logout</code></pre>
+    <p>
+      The token is read from <code>--token</code>, then
+      <code>HF_TOKEN</code> / <code>HUGGING_FACE_HUB_TOKEN</code>, then the
+      stored tokens. Gated repos work the same way; nothing needs the token if
+      the repo is public.
+    </p>
+
+    <h2>Two licences, on purpose</h2>
+    <ul>
+      <li><strong><code>hfd-core</code></strong>, the download library: Apache 2.0. Embed it in anything, commercial included.</li>
+      <li><strong>Everything else</strong>, including the <code>hfd</code> command: PolyForm Noncommercial 1.0.0. Commercial use needs a written agreement.</li>
+    </ul>
+    <p>
+      That split is deliberate: the pieces other software wants to link are
+      permissive, the tool itself is not free for commercial use.
+    </p>
+
+    <div class="pager">
+      <a href="engine.html">&larr; LastEngine</a>
+      <a href="vision.html">Next: the vision &rarr;</a>
+    </div>
+  </main>
+</div>
+
+<footer class="doc-foot">
+  <span>Written and maintained by <a href="https://github.com/TheSyrianDev">TheSyrianDev</a>.</span>
+  <span><a href="../">Last AI site</a> · <a href="https://github.com/TheSyrianDev/hf-dl">Source</a></span>
+</footer>
+
+<script src="../themes.js"></script>
+<script type="module" src="../theme.js"></script>
+</body>
+</html>

@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Last AI suite — documentation</title>
+<meta name="description" content="Documentation for the Last AI suite: Last AI, the LastHarness core, the LastEngine inference engine and the hf-dl downloader. What each part does, what it does not do, and how they fit together.">
+<meta name="theme-color" content="#0b120e">
+<link rel="icon" href="../assets/lastai.png">
+<link rel="preconnect" href="https://cdn.fontshare.com" crossorigin>
+<link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@700,800&f[]=switzer@400,500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap">
+<script>
+  (function () {
+    try {
+      var root = document.documentElement;
+      var choice = localStorage.getItem("lastai-site-theme") || "auto";
+      if (choice !== "auto") { root.dataset.theme = choice; return; }
+      var saved = localStorage.getItem("lastai-site-vars");
+      if (!saved) return;
+      var theme = JSON.parse(saved);
+      for (var name in theme.vars) root.style.setProperty(name, theme.vars[name]);
+      root.style.colorScheme = theme.mode || "dark";
+    } catch (e) {}
+  })();
+</script>
+<link rel="stylesheet" href="../style.css">
+<link rel="stylesheet" href="../themes.css">
+<link rel="stylesheet" href="docs.css">
+</head>
+<body>
+
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="doc-top">
+  <a class="doc-brand" href="../">Last AI <span>Documentation</span></a>
+  <nav class="doc-nav" aria-label="Documentation">
+    <a href="./" aria-current="page">Overview</a>
+    <a href="lastai.html">Last AI</a>
+    <a href="harness.html">Harness</a>
+    <a href="engine.html">Engine</a>
+    <a href="hf-dl.html">hf-dl</a>
+    <a href="vision.html">Vision</a>
+  </nav>
+  <button class="theme-btn" type="button" data-theme-open aria-haspopup="dialog" aria-label="Theme">
+    <span class="theme-btn-swatch" data-theme-swatch aria-hidden="true"></span>
+    <span data-theme-label>Theme</span>
+  </button>
+</header>
+
+<div class="doc-shell">
+  <aside class="doc-side">
+    <h2>The suite</h2>
+    <ul>
+      <li><a href="./" aria-current="page">Overview</a></li>
+      <li><a href="vision.html">Vision</a></li>
+    </ul>
+    <h2>The parts</h2>
+    <ul>
+      <li><a href="lastai.html">Last AI <code>LAI</code></a></li>
+      <li><a href="harness.html">LastHarness <code>LH</code></a></li>
+      <li><a href="engine.html">LastEngine <code>LE</code></a></li>
+      <li><a href="hf-dl.html">hf-dl</a></li>
+    </ul>
+    <h2>Elsewhere</h2>
+    <ul>
+      <li><a href="../">Last AI site</a></li>
+      <li><a href="../downloads.html">Downloads</a></li>
+      <li><a href="https://github.com/TheSyrianDev">GitHub</a></li>
+    </ul>
+  </aside>
+
+  <main class="doc" id="main">
+    <p class="eyebrow">Documentation</p>
+    <h1>The Last AI suite</h1>
+    <p class="lede">
+      Four programs written in Rust for one person's computer: an assistant, the
+      harness under it, an inference engine, and a downloader. They fit together
+      as Last AI. Each one also works with nothing else from the family.
+    </p>
+
+    <h2>The four parts</h2>
+    <table>
+      <thead>
+        <tr><th>Part</th><th>What it is</th><th>State</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><a href="lastai.html">Last AI</a></td>
+          <td>The studio. Desktop app and terminal client over a local core: conversations, memory, tools, a team of departments and workers, spend limits.</td>
+          <td>0.1.0-alpha.3</td>
+        </tr>
+        <tr>
+          <td><a href="harness.html">LastHarness</a></td>
+          <td>The turn loop and everything around it — providers, tools with permissions, memory, team, MCP. No UI of its own, no downloader, no engine.</td>
+          <td>inside Last AI</td>
+        </tr>
+        <tr>
+          <td><a href="engine.html">LastEngine</a></td>
+          <td>Inference. One backend trait, several implementations, a hardware probe that decides what this machine can actually run.</td>
+          <td>0.1.0, in development</td>
+        </tr>
+        <tr>
+          <td><a href="hf-dl.html">hf-dl</a></td>
+          <td>A Hugging Face downloader. Resumable, segmented, verified transfers, with a queue you can leave running.</td>
+          <td>v0.4.0-rc.1</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>How they fit</h2>
+    <p>
+      Last AI is the only thing you are meant to install as a product. The core
+      (<code>lastaid</code>) listens on <code>127.0.0.1</code> and holds the
+      state; the desktop app, the terminal client and paired browsers are thin
+      clients of that one HTTP API. Models arrive through hf-dl and are served
+      either by a local runtime you already run, or — later — by LastEngine
+      behind the same provider interface.
+    </p>
+<pre><code>desktop app   terminal (la)   paired browser   messaging channels
+      \             |                |                /
+       \            v                v               /
+        +--------- lastaid (core: turn loop, team, tools, memory) ---------+
+        |                             |                                    |
+        |                             +-- permission rules -> tool calls   |
+        |                             +-- spend ledger -> provider layer   |
+        |                                                         |        |
+        +---------------------------------------------------------+        |
+                                                                          |
+   provider layer: llama-swap / llama.cpp / Ollama / LM Studio / OpenAI-   |
+   compatible / Anthropic-style APIs  .......... and, eventually, Last-    |
+   Engine behind the same shape                                            |
+                                                                          |
+   models and datasets: hf-dl -> ~/AI/Models -> the runtime you point at    |</code></pre>
+    <p>
+      Nothing in that picture needs the network except a provider you added and
+      a download you started.
+    </p>
+
+    <h2>What one turn looks like</h2>
+    <ol>
+      <li>You type into the app or the terminal; the client posts to the core.</li>
+      <li>The core assembles the prompt: the base prompt, then your learned rules, style and skills as separate blocks after it, then memory the task needs.</li>
+      <li>The model replies. If it asks for a tool, the permission rule for that tool decides: reads are free, writes ask once, risky things always ask.</li>
+      <li>Anything that costs money is written to the spend ledger, priced from <code>spend.toml</code> when you supplied prices.</li>
+      <li>If the goal is bigger than one turn, the core hands it to a department: a lead plans, workers run the steps, the lead checks the results, and what it cannot settle comes back to you with everything that was tried.</li>
+      <li>What is worth keeping becomes a note (Markdown you can read) or a rule waiting for your approval.</li>
+    </ol>
+
+    <h2>Quick start</h2>
+<pre><code># the whole studio, from source
+git clone https://github.com/TheSyrianDev/LastAI
+cd LastAI
+cargo build --release
+
+target/release/la setup    # twelve questions, Enter takes the default
+target/release/lastaid     # the core, on 127.0.0.1:7842
+target/release/la          # chat
+
+# a model first, if you have none
+cargo install --path ../hf-dl/crates/hfd-cli
+hfd download Qwen/Qwen3-0.6B --include "*.gguf" --local-dir ~/AI/Models</code></pre>
+    <p>
+      Prebuilt packages for Linux, Windows and macOS (early alpha) are on the
+      <a href="../downloads.html">downloads page</a>.
+    </p>
+
+    <h2>The rules the suite is built on</h2>
+    <ul>
+      <li><strong>Local first.</strong> The core binds to loopback only. There is no account, no telemetry endpoint, no billing behind a key.</li>
+      <li><strong>Stand-alone parts.</strong> The engine runs without the app, the harness runs against any OpenAI-compatible server, and the downloader is just a downloader.</li>
+      <li><strong>Say the version.</strong> Every page and README names the release and the gaps. Pre-release means pre-release.</li>
+      <li><strong>Nothing hidden in the prompt.</strong> Learned behaviour is appended in separate blocks, versioned, and applied without asking is logged.</li>
+      <li><strong>Secrets stay in the OS store</strong> — Secret Service, Keychain, Credential Manager. Config holds a reference, never the value.</li>
+    </ul>
+
+    <div class="note">
+      <p>
+        Last AI, LastHarness and LastEngine are licensed PolyForm
+        Noncommercial 1.0.0: source-available, not open source, commercial use
+        by written agreement. hf-dl's library crate, <code>hfd-core</code>, is
+        Apache 2.0 so it can be embedded anywhere; the <code>hfd</code> command
+        itself is PolyForm Noncommercial.
+      </p>
+    </div>
+
+    <div class="pager">
+      <span></span>
+      <a href="vision.html">Next: the vision &rarr;</a>
+    </div>
+  </main>
+</div>
+
+<footer class="doc-foot">
+  <span>Written and maintained by <a href="https://github.com/TheSyrianDev">TheSyrianDev</a>.</span>
+  <span><a href="../">Last AI site</a> · <a href="https://github.com/TheSyrianDev/LastAI">Source</a></span>
+</footer>
+
+<script src="../themes.js"></script>
+<script type="module" src="../theme.js"></script>
+</body>
+</html>

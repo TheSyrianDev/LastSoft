@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Last AI — documentation</title>
+<meta name="description" content="Install and run Last AI: the desktop app, the la terminal client and the lastaid core. Providers, models, memory, the team of departments, permissions and where files live.">
+<meta name="theme-color" content="#0b120e">
+<link rel="icon" href="../assets/lastai.png">
+<link rel="preconnect" href="https://cdn.fontshare.com" crossorigin>
+<link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@700,800&f[]=switzer@400,500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap">
+<script>
+  (function () {
+    try {
+      var root = document.documentElement;
+      var choice = localStorage.getItem("lastai-site-theme") || "auto";
+      if (choice !== "auto") { root.dataset.theme = choice; return; }
+      var saved = localStorage.getItem("lastai-site-vars");
+      if (!saved) return;
+      var theme = JSON.parse(saved);
+      for (var name in theme.vars) root.style.setProperty(name, theme.vars[name]);
+      root.style.colorScheme = theme.mode || "dark";
+    } catch (e) {}
+  })();
+</script>
+<link rel="stylesheet" href="../style.css">
+<link rel="stylesheet" href="../themes.css">
+<link rel="stylesheet" href="docs.css">
+</head>
+<body>
+
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="doc-top">
+  <a class="doc-brand" href="../">Last AI <span>Documentation</span></a>
+  <nav class="doc-nav" aria-label="Documentation">
+    <a href="./">Overview</a>
+    <a href="lastai.html" aria-current="page">Last AI</a>
+    <a href="harness.html">Harness</a>
+    <a href="engine.html">Engine</a>
+    <a href="hf-dl.html">hf-dl</a>
+    <a href="vision.html">Vision</a>
+  </nav>
+  <button class="theme-btn" type="button" data-theme-open aria-haspopup="dialog" aria-label="Theme">
+    <span class="theme-btn-swatch" data-theme-swatch aria-hidden="true"></span>
+    <span data-theme-label>Theme</span>
+  </button>
+</header>
+
+<div class="doc-shell">
+  <aside class="doc-side">
+    <h2>The suite</h2>
+    <ul>
+      <li><a href="./">Overview</a></li>
+      <li><a href="vision.html">Vision</a></li>
+    </ul>
+    <h2>The parts</h2>
+    <ul>
+      <li><a href="lastai.html" aria-current="page">Last AI <code>LAI</code></a></li>
+      <li><a href="harness.html">LastHarness <code>LH</code></a></li>
+      <li><a href="engine.html">LastEngine <code>LE</code></a></li>
+      <li><a href="hf-dl.html">hf-dl</a></li>
+    </ul>
+    <h2>Elsewhere</h2>
+    <ul>
+      <li><a href="../">Last AI site</a></li>
+      <li><a href="../downloads.html">Downloads</a></li>
+      <li><a href="https://github.com/TheSyrianDev">GitHub</a></li>
+    </ul>
+  </aside>
+
+  <main class="doc" id="main">
+    <p class="eyebrow">Part LAI · 0.1.0-alpha.3</p>
+    <h1>Last AI</h1>
+    <p class="lede">
+      A local-first AI studio for one person's computer. A desktop app and a
+      terminal client in front of a small core that keeps the conversation, the
+      memory, the tools, the money and the team of workers.
+    </p>
+
+    <div class="note">
+      <p>
+        Alpha. Tested on Linux (Omarchy) and Windows; the macOS build starts in
+        CI but nobody has used it day to day. Expect breaking changes.
+      </p>
+    </div>
+
+    <h2>Three programs</h2>
+    <table>
+      <tbody>
+        <tr><td><code>lastaid</code></td><td>The core. Holds state, listens on <code>127.0.0.1:7842</code> only.</td></tr>
+        <tr><td><code>la</code> / <code>lastai</code></td><td>The terminal client, one program under two names.</td></tr>
+        <tr><td><code>lastai-gui</code></td><td>The desktop app. Finds the core and its token by itself.</td></tr>
+      </tbody>
+    </table>
+    <p>
+      The clients are thin: everything they show comes from the core over
+      localhost. Stop the core and the app has nothing to talk to.
+    </p>
+
+    <h2>Install</h2>
+    <p>
+      Prebuilt packages are attached to each
+      <a href="https://github.com/TheSyrianDev/LastAI/releases">GitHub release</a>:
+      <code>.deb</code>, <code>.rpm</code>, an Arch package, an AppImage, a
+      Windows zip, and an unsigned macOS <code>.app</code> in a zip. On Linux,
+      <a href="../downloads.html">the download page's script</a> works out your
+      distribution first.
+    </p>
+    <p>From source, with Rust stable:</p>
+<pre><code>cargo build --release                     # all four binaries
+cargo build --release -p lh-core -p lh-tui  # just the core and terminal</code></pre>
+
+    <h2>First run</h2>
+<pre><code>la setup        # twelve questions; Enter accepts each default
+lastaid         # start the core (reads config.toml)
+la              # chat
+lastai-gui      # or the desktop app, with the core running</code></pre>
+    <p>
+      To keep the core alive across logins: <code>lh service preview</code>, then
+      <code>lh service install</code>. That writes a systemd <em>user</em>
+      service — no sudo — so closing the terminal never stops the core.
+    </p>
+
+    <h2>Providers and models</h2>
+    <p>
+      A provider is a server that answers chat: llama-swap, llama.cpp, Ollama,
+      LM Studio, any OpenAI-compatible endpoint, or an Anthropic-style cloud API.
+      Add and test them on the Models and keys page, or with <code>lh settings</code>.
+      API keys are read from environment variables you name. Nothing is sent to a
+      provider you have not added.
+    </p>
+    <p>
+      The same page searches Hugging Face for GGUF files and groups the results by
+      whether they fit this machine's memory — <em>Fits in memory</em>,
+      <em>Tight</em>, <em>Too big</em>, <em>Size not known</em> — then downloads
+      into <code>~/AI/Models/</code>. A model your llama-swap router does not serve
+      yet gets a <em>Run</em> button that backs up the router files, validates the
+      matrix and restarts the router. Models already served show <em>Use in chat</em>.
+    </p>
+    <p>
+      The Create block on the same page makes images (Z-Image Turbo) and short
+      videos (Wan 2.2 TI2V-5B) through a local ComfyUI on
+      <code>127.0.0.1:8188</code>, saving into <code>~/AI/Create/</code>. Image and
+      video jobs take the machine lock and free GPU memory when done, so they wait
+      while another session holds it. ComfyUI and its weights are not part of the
+      repository.
+    </p>
+
+    <h2>Memory, learning, and the team</h2>
+    <ul>
+      <li><strong>Memory</strong> is Markdown notes under <code>~/.local/share/lastai/memory/</code>. Read them, edit them, delete them — the core treats files as truth.</li>
+      <li><strong>Learning</strong> produces rules, style notes and skills. Each one waits for approval; what gets applied without asking is logged so you can undo it.</li>
+      <li><strong>Team</strong> is departments of role workers, each a Markdown file: lead, members, model, tools, memory slice. Give a department a goal with <code>lh team run</code> and its lead plans, its workers run in parallel up to your limit, and the lead checks each result before you see it. Departments nest; a sub-department is a step whose failure comes back as a failed step.</li>
+      <li><strong>Permissions</strong> are tiered: reads are free, writes ask once, anything risky always asks. Sensitive notes and rules are only ever used with a model on this machine.</li>
+    </ul>
+
+    <h2>Commands worth knowing</h2>
+    <table>
+      <tbody>
+        <tr><td><code>lh setup</code></td><td>First-run questions.</td></tr>
+        <tr><td><code>lh settings</code></td><td>See and change every setting (<code>set</code>, <code>reset</code>).</td></tr>
+        <tr><td><code>lh memory</code></td><td>The notes the assistant keeps.</td></tr>
+        <tr><td><code>lh learn</code></td><td>Rules, style, skills, suggestions waiting for you.</td></tr>
+        <tr><td><code>lh team</code></td><td>Roles, model types, departments, goals, workers, away mode, plugin folders.</td></tr>
+        <tr><td><code>lh mcp</code></td><td>MCP servers. Nothing runs until you approve it.</td></tr>
+        <tr><td><code>lh trust &lt;folder&gt;</code></td><td>Which project folders may bring their own MCP servers.</td></tr>
+        <tr><td><code>lh devices</code></td><td>Pair a browser with a PIN, list, remove.</td></tr>
+        <tr><td><code>lh channels</code></td><td>Telegram, Matrix, Slack, Signal — off until switched on.</td></tr>
+        <tr><td><code>lh export</code> / <code>lh import</code></td><td>Move memory, rules, style, roles and departments.</td></tr>
+        <tr><td><code>lh service</code></td><td>Start the core at login.</td></tr>
+      </tbody>
+    </table>
+    <p>
+      Every command has <code>help</code>, and it works with the core stopped:
+      <code>lh team help</code>.
+    </p>
+
+    <h2>Where files live</h2>
+    <table>
+      <tbody>
+        <tr><td><code>~/.config/lastai/config.toml</code></td><td>Settings. Optional <code>spend.toml</code> beside it for prices.</td></tr>
+        <tr><td><code>~/.local/share/lastai/</code></td><td><code>lh.db</code> (activity log, rules, indexes), <code>memory/</code>, <code>skills/</code>, <code>team/</code>, <code>mcp.json</code>, <code>web/</code>.</td></tr>
+        <tr><td><code>$XDG_RUNTIME_DIR/lastai/token</code></td><td>The token the clients need. Not in your home directory.</td></tr>
+        <tr><td><code>~/.config/lastai/themes/</code></td><td>Looks: one folder per look, a <code>theme.toml</code>, optionally <code>background.png</code>.</td></tr>
+      </tbody>
+    </table>
+
+    <h2>What is not there yet</h2>
+    <ul>
+      <li>A phone app, and any final visual design (no logo or brand colours inside the app).</li>
+      <li>Signed installers and updates; crash reports are prepared but not sent.</li>
+      <li>The hosted relay, subscriptions, memory sync.</li>
+      <li>Agents loading and unloading local models on their own — they can list models, pick one among your providers, and propose a new provider for you to approve.</li>
+      <li>Installing a plugin from a link (folders only), and project-level skills.</li>
+      <li>Messaging channels tested against real accounts; they run against mocks.</li>
+    </ul>
+
+    <div class="pager">
+      <a href="./">&larr; Overview</a>
+      <a href="harness.html">Next: LastHarness &rarr;</a>
+    </div>
+  </main>
+</div>
+
+<footer class="doc-foot">
+  <span>Written and maintained by <a href="https://github.com/TheSyrianDev">TheSyrianDev</a>.</span>
+  <span><a href="../">Last AI site</a> · <a href="https://github.com/TheSyrianDev/LastAI">Source</a></span>
+</footer>
+
+<script src="../themes.js"></script>
+<script type="module" src="../theme.js"></script>
+</body>
+</html>
