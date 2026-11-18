@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Last AI — documentation</title>
-<meta name="description" content="Install and run Last AI: the desktop app, the la terminal client and the lastaid core. Providers, models, memory, the team of departments, permissions and where files live.">
+<meta name="description" content="Install and run Last AI: the desktop app, the lai terminal client and the lastaid core. Providers, models, memory, the team of departments, permissions and where files live.">
 <meta name="theme-color" content="#0b120e">
 <link rel="icon" href="../assets/lastai.png">
 <link rel="preconnect" href="https://cdn.fontshare.com" crossorigin>
@@ -39,7 +39,7 @@
     <a href="lastai.html" aria-current="page">Last AI</a>
     <a href="harness.html">Harness</a>
     <a href="engine.html">Engine</a>
-    <a href="hf-dl.html">hf-dl</a>
+    <a href="model-downloader.html">Model-Downloader</a>
     <a href="vision.html">Vision</a>
   </nav>
   <button class="theme-btn" type="button" data-theme-open aria-haspopup="dialog" aria-label="Theme">
@@ -60,7 +60,7 @@
       <li><a href="lastai.html" aria-current="page">Last AI <code>LAI</code></a></li>
       <li><a href="harness.html">LastHarness <code>LH</code></a></li>
       <li><a href="engine.html">LastEngine <code>LE</code></a></li>
-      <li><a href="hf-dl.html">hf-dl</a></li>
+      <li><a href="model-downloader.html">Model-Downloader <code>MDL</code></a></li>
     </ul>
     <h2>Elsewhere</h2>
     <ul>
@@ -90,7 +90,7 @@
     <table>
       <tbody>
         <tr><td><code>lastaid</code></td><td>The core. Holds state, listens on <code>127.0.0.1:7842</code> only.</td></tr>
-        <tr><td><code>la</code> / <code>lastai</code></td><td>The terminal client, one program under two names.</td></tr>
+        <tr><td><code>lai</code> / <code>lastai</code></td><td>The terminal client, one program under two names.</td></tr>
         <tr><td><code>lastai-gui</code></td><td>The desktop app. Finds the core and its token by itself.</td></tr>
       </tbody>
     </table>
@@ -113,9 +113,9 @@
 cargo build --release -p lh-core -p lh-tui  # just the core and terminal</code></pre>
 
     <h2>First run</h2>
-<pre><code>la setup        # twelve questions; Enter accepts each default
+<pre><code>lai setup        # twelve questions; Enter accepts each default
 lastaid         # start the core (reads config.toml)
-la              # chat
+lai              # chat
 lastai-gui      # or the desktop app, with the core running</code></pre>
     <p>
       To keep the core alive across logins: <code>lh service preview</code>, then

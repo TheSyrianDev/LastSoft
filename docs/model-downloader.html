@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>hf-dl — the model downloader — documentation</title>
-<meta name="description" content="hf-dl documented: the model downloader for the Hugging Face Hub, ModelScope and (opt-in) Pirate Face — resumable segmented transfers, verification, a background queue and token handling.">
+<title>Model-Downloader — documentation</title>
+<meta name="description" content="Model-Downloader documented: models and datasets from the Hugging Face Hub, ModelScope and (opt-in) Pirate Face — resumable segmented transfers, verification, a background queue and token handling.">
 <meta name="theme-color" content="#0b120e">
 <link rel="icon" href="../assets/lastai.png">
 <link rel="preconnect" href="https://cdn.fontshare.com" crossorigin>
@@ -39,7 +39,7 @@
     <a href="lastai.html">Last AI</a>
     <a href="harness.html">Harness</a>
     <a href="engine.html">Engine</a>
-    <a href="hf-dl.html" aria-current="page">hf-dl</a>
+    <a href="model-downloader.html" aria-current="page">Model-Downloader</a>
     <a href="vision.html">Vision</a>
   </nav>
   <button class="theme-btn" type="button" data-theme-open aria-haspopup="dialog" aria-label="Theme">
@@ -60,7 +60,7 @@
       <li><a href="lastai.html">Last AI <code>LAI</code></a></li>
       <li><a href="harness.html">LastHarness <code>LH</code></a></li>
       <li><a href="engine.html">LastEngine <code>LE</code></a></li>
-      <li><a href="hf-dl.html" aria-current="page">hf-dl</a></li>
+      <li><a href="model-downloader.html" aria-current="page">Model-Downloader <code>MDL</code></a></li>
     </ul>
     <h2>Elsewhere</h2>
     <ul>
@@ -71,8 +71,8 @@
   </aside>
 
   <main class="doc" id="main">
-    <p class="eyebrow">Part hf-dl · v0.4.0-rc.1</p>
-    <h1>hf-dl, the model downloader</h1>
+    <p class="eyebrow">Part Model-Downloader · v0.4.0-rc.1</p>
+    <h1>Model-Downloader</h1>
     <p class="lede">
       A downloader in Rust for models and datasets, wherever they live: the
       Hugging Face Hub, ModelScope, and — opt-in, over BitTorrent — Pirate Face.
@@ -88,16 +88,16 @@
     <h2>Install</h2>
 <pre><code>cargo install --path crates/hfd-cli      # needs Rust 1.88 or newer</code></pre>
     <p>
-      Two binaries are installed, <code>hfd</code> and <code>hf-dl</code>. They
+      Two binaries are installed, <code>mdl</code> and <code>Model-Downloader</code>. They
       are the same program.
     </p>
 
     <h2>Download something</h2>
-<pre><code>hfd download &lt;repo-id | hf:// URI | web URL&gt; [paths...]
+<pre><code>mdl download &lt;repo-id | hf:// URI | web URL&gt; [paths...]
 
-hfd download Qwen/Qwen3-0.6B --include "*.safetensors" --local-dir ./model
-hfd download &lt;repo&gt; &lt;file.gguf&gt; --local-dir ./models --flat
-hfd download &lt;repo&gt; --dry-run        # resolve the files, print the plan, fetch nothing</code></pre>
+mdl download Qwen/Qwen3-0.6B --include "*.safetensors" --local-dir ./model
+mdl download &lt;repo&gt; &lt;file.gguf&gt; --local-dir ./models --flat
+mdl download &lt;repo&gt; --dry-run        # resolve the files, print the plan, fetch nothing</code></pre>
     <p>
       <code>--flat</code> puts files by basename with no subfolders, which is
       what a llama-swap folder usually wants. <code>--dry-run</code> is the
@@ -118,8 +118,8 @@ hfd download &lt;repo&gt; --dry-run        # resolve the files, print the plan, 
         <tr><td><code>pirateface</code></td><td>A listing lookup plus a torrent fetched with a user-installed <code>aria2c</code>. Seeding is switched off. Needs <code>--local-dir</code>.</td></tr>
       </tbody>
     </table>
-<pre><code>hfd download Qwen/Qwen3-0.6B --source modelscope --local-dir ./model
-hfd download AI-ModelScope/ShareGPT-4o --source modelscope --type dataset --dry-run</code></pre>
+<pre><code>mdl download Qwen/Qwen3-0.6B --source modelscope --local-dir ./model
+mdl download AI-ModelScope/ShareGPT-4o --source modelscope --type dataset --dry-run</code></pre>
     <p>
       <code>MODELSCOPE_API</code> points the ModelScope source at a mirror, and
       <code>MODELSCOPE_API_TOKEN</code> (or <code>MODELSCOPE_TOKEN</code>) is
@@ -159,20 +159,20 @@ hfd download AI-ModelScope/ShareGPT-4o --source modelscope --type dataset --dry-
     </p>
 
     <h2>Leave it running</h2>
-<pre><code>hfd download &lt;repo&gt; --detach         # enqueue and return immediately
-hfd queue list | show &lt;id&gt; | pause &lt;id&gt; | resume &lt;id&gt; | cancel &lt;id&gt; | clear
-hfd daemon                           # run the daemon in the foreground</code></pre>
+<pre><code>mdl download &lt;repo&gt; --detach         # enqueue and return immediately
+mdl queue list | show &lt;id&gt; | pause &lt;id&gt; | resume &lt;id&gt; | cancel &lt;id&gt; | clear
+mdl daemon                           # run the daemon in the foreground</code></pre>
     <p>
       The queue is persistent, so a 60&nbsp;GB pull can be paused in the evening
       and resumed the next day without re-reading the plan.
     </p>
 
     <h2>Tokens</h2>
-<pre><code>hfd auth login        # paste a token, or use the browser device flow
-hfd auth whoami
-hfd auth list
-hfd auth token        # prints the active token to stdout
-hfd auth logout</code></pre>
+<pre><code>mdl auth login        # paste a token, or use the browser device flow
+mdl auth whoami
+mdl auth list
+mdl auth token        # prints the active token to stdout
+mdl auth logout</code></pre>
     <p>
       The token is read from <code>--token</code>, then
       <code>HF_TOKEN</code> / <code>HUGGING_FACE_HUB_TOKEN</code>, then the
@@ -183,7 +183,7 @@ hfd auth logout</code></pre>
     <h2>Two licences, on purpose</h2>
     <ul>
       <li><strong><code>hfd-core</code></strong>, the download library: Apache 2.0. Embed it in anything, commercial included.</li>
-      <li><strong>Everything else</strong>, including the <code>hfd</code> command: PolyForm Noncommercial 1.0.0. Commercial use needs a written agreement.</li>
+      <li><strong>Everything else</strong>, including the <code>mdl</code> command: PolyForm Noncommercial 1.0.0. Commercial use needs a written agreement.</li>
     </ul>
     <p>
       That split is deliberate: the pieces other software wants to link are
@@ -199,7 +199,7 @@ hfd auth logout</code></pre>
 
 <footer class="doc-foot">
   <span>Written and maintained by <a href="https://github.com/TheSyrianDev">TheSyrianDev</a>.</span>
-  <span><a href="../">Last AI site</a> · <a href="https://github.com/TheSyrianDev/hf-dl">Source</a></span>
+  <span><a href="../">Last AI site</a> · <a href="https://github.com/TheSyrianDev/Model-Downloader">Source</a></span>
 </footer>
 
 <script src="../themes.js"></script>

@@ -258,7 +258,7 @@ async function figure() {
     ai: ["team", "engine", "feed"],
     lh: ["team"],
     engine: ["engine"],
-    hfd: ["feed"],
+    mdl: ["feed"],
   };
 
   const level = { team: 0, engine: 0, feed: 0 };

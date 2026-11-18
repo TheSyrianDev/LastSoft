@@ -1,7 +1,7 @@
 #!/bin/sh
 # Install Last AI on Linux.
 #
-#   curl -fsSL https://thesyriandev.github.io/lastsoft/install.sh | sh
+#   curl -fsSL https://thesyriandev.github.io/LastSoft/install.sh | sh
 #
 # It reads /etc/os-release, picks the build that matches the distribution, and
 # installs it: on Omarchy the Omarchy package (lastai-omarchy, the only build
@@ -20,7 +20,7 @@
 set -eu
 
 REPO="TheSyrianDev/LastAI"
-SITE="https://thesyriandev.github.io/lastsoft"
+SITE="https://thesyriandev.github.io/LastSoft"
 OS_RELEASE="${OS_RELEASE:-/etc/os-release}"
 API="https://api.github.com/repos/$REPO/releases"
 
@@ -48,7 +48,7 @@ usage() {
   cat <<'TEXT'
 Install Last AI on Linux.
 
-  curl -fsSL https://thesyriandev.github.io/lastsoft/install.sh | sh
+  curl -fsSL https://thesyriandev.github.io/LastSoft/install.sh | sh
 
 It reads /etc/os-release, picks the build that matches the distribution, and
 installs it: on Omarchy the Omarchy package (lastai-omarchy, the only build

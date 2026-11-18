@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>The Last AI suite — documentation</title>
-<meta name="description" content="Documentation for the Last AI suite: Last AI, the LastHarness core, the LastEngine inference engine and the hf-dl downloader. What each part does, what it does not do, and how they fit together.">
+<meta name="description" content="Documentation for the Last AI suite: Last AI, the LastHarness core, the LastEngine inference engine and the Model-Downloader downloader. What each part does, what it does not do, and how they fit together.">
 <meta name="theme-color" content="#0b120e">
 <link rel="icon" href="../assets/lastai.png">
 <link rel="preconnect" href="https://cdn.fontshare.com" crossorigin>
@@ -39,7 +39,7 @@
     <a href="lastai.html">Last AI</a>
     <a href="harness.html">Harness</a>
     <a href="engine.html">Engine</a>
-    <a href="hf-dl.html">hf-dl</a>
+    <a href="model-downloader.html">Model-Downloader</a>
     <a href="vision.html">Vision</a>
   </nav>
   <button class="theme-btn" type="button" data-theme-open aria-haspopup="dialog" aria-label="Theme">
@@ -60,7 +60,7 @@
       <li><a href="lastai.html">Last AI <code>LAI</code></a></li>
       <li><a href="harness.html">LastHarness <code>LH</code></a></li>
       <li><a href="engine.html">LastEngine <code>LE</code></a></li>
-      <li><a href="hf-dl.html">hf-dl</a></li>
+      <li><a href="model-downloader.html">Model-Downloader <code>MDL</code></a></li>
     </ul>
     <h2>Elsewhere</h2>
     <ul>
@@ -101,7 +101,7 @@
           <td>0.1.0, in development</td>
         </tr>
         <tr>
-          <td><a href="hf-dl.html">hf-dl</a></td>
+          <td><a href="model-downloader.html">Model-Downloader</a></td>
           <td>The model downloader. Hugging Face Hub and ModelScope over HTTPS, an opt-in Pirate Face route, resumable and verified, with a queue you can leave running.</td>
           <td>v0.4.0-rc.1</td>
         </tr>
@@ -113,11 +113,11 @@
       Last AI is the only thing you are meant to install as a product. The core
       (<code>lastaid</code>) listens on <code>127.0.0.1</code> and holds the
       state; the desktop app, the terminal client and paired browsers are thin
-      clients of that one HTTP API. Models arrive through hf-dl and are served
+      clients of that one HTTP API. Models arrive through Model-Downloader and are served
       either by a local runtime you already run, or — later — by LastEngine
       behind the same provider interface.
     </p>
-<pre><code>desktop app   terminal (la)   paired browser   messaging channels
+<pre><code>desktop app   terminal (lai)   paired browser   messaging channels
       \             |                |                /
        \            v                v               /
         +--------- lastaid (core: turn loop, team, tools, memory) ---------+
@@ -131,7 +131,7 @@
    compatible / Anthropic-style APIs  .......... and, eventually, Last-    |
    Engine behind the same shape                                            |
                                                                           |
-   models and datasets: hf-dl -> ~/AI/Models -> the runtime you point at    |</code></pre>
+   models and datasets: Model-Downloader -> ~/AI/Models                    |
     <p>
       Nothing in that picture needs the network except a provider you added and
       a download you started.
@@ -158,8 +158,8 @@ target/release/lastaid     # the core, on 127.0.0.1:7842
 target/release/la          # chat
 
 # a model first, if you have none
-cargo install --path ../hf-dl/crates/hfd-cli
-hfd download Qwen/Qwen3-0.6B --include "*.gguf" --local-dir ~/AI/Models</code></pre>
+cargo install --path ../Model-Downloader/crates/hfd-cli
+mdl download Qwen/Qwen3-0.6B --include "*.gguf" --local-dir ~/AI/Models</code></pre>
     <p>
       Prebuilt packages for Linux, Windows and macOS (early alpha) are on the
       <a href="../downloads.html">downloads page</a>.
@@ -178,8 +178,8 @@ hfd download Qwen/Qwen3-0.6B --include "*.gguf" --local-dir ~/AI/Models</code></
       <p>
         Last AI, LastHarness and LastEngine are licensed PolyForm
         Noncommercial 1.0.0: source-available, not open source, commercial use
-        by written agreement. hf-dl's library crate, <code>hfd-core</code>, is
-        Apache 2.0 so it can be embedded anywhere; the <code>hfd</code> command
+        by written agreement. Model-Downloader's library crate, <code>hfd-core</code>, is
+        Apache 2.0 so it can be embedded anywhere; the <code>mdl</code> command
         itself is PolyForm Noncommercial.
       </p>
     </div>
