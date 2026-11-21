@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Last AI — the last AI studio you'll need</title>
-<meta name="description" content="Last AI is a local-first AI studio that works as a team: your assistant hands bigger goals to a department, whose lead splits them across workers and checks the result. Built from three parts — the LastHarness harness, the LastEngine inference engine and the Model-Downloader downloader. No account, no cloud.">
+<title>Last AI - the last AI studio you'll need</title>
+<meta name="description" content="Last AI is a local-first AI studio that works as a team: your assistant hands bigger goals to a department, whose lead splits them across workers and checks the result. Built from three parts: the LastHarness harness, the LastEngine inference engine and the Model-Downloader downloader. No account, no cloud.">
 <meta name="theme-color" content="#0b120e">
 <link rel="icon" href="assets/lastai.png">
 <link rel="preconnect" href="https://cdn.fontshare.com" crossorigin>
@@ -28,6 +28,9 @@
 </script>
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="themes.css">
+<script type="importmap">
+  { "imports": { "three": "./vendor/three.module.js" } }
+</script>
 <script>
   document.documentElement.classList.add('motion');
   addEventListener('load', function () {
@@ -106,7 +109,7 @@
           <line x1="14" y1="304" x2="26" y2="304"/>
         </svg>
       </div>
-      <figcaption>Fig. 1 — a goal moving through the team: core, departments, workers; the engine around them; models arriving from below.</figcaption>
+      <figcaption>Fig. 1: a goal moving through the team: core, departments, workers; the engine around them; models arriving from below.</figcaption>
     </figure>
   </section>
 
@@ -117,7 +120,7 @@
       You talk to the assistant. Bigger work it hands to a <strong>department</strong>:
       a named group of workers with a lead. The lead splits the goal into steps,
       gives each step to a worker, and checks what comes back. The rest of the
-      product — memory, tools, spend — sits around that loop, and everything
+      product (memory, tools, spend) sits around that loop, and everything
       below runs on your own machine.
     </p>
 
@@ -148,7 +151,7 @@
         <dt>Nested</dt>
         <p>A department can hold sub-departments. A sub-department is a step that
         runs its own plan with its own lead, and its failure comes back as a
-        failed step — so the same checks apply at every depth, and a stuck team
+        failed step, so the same checks apply at every depth, and a stuck team
         cannot loop or run up cost unnoticed.</p>
       </div>
       <div data-reveal>
@@ -198,8 +201,8 @@
         <div class="part-body">
           <h3><a href="https://github.com/TheSyrianDev/LastEngine">LastEngine</a></h3>
           <p>
-            Inference of its own. One backend trait, several implementations —
-            CUDA, CPU, Vulkan, ROCm, Metal — chosen at startup by probing the
+            Inference of its own. One backend trait, several implementations
+            (CUDA, CPU, Vulkan, ROCm, Metal) chosen at startup by probing the
             hardware, with layers split across CPU and GPU for small cards.
           </p>
         </div>
@@ -237,7 +240,7 @@
       </div>
       <div data-reveal>
         <dt>Hold your keys in a file</dt>
-        <dd>Secrets live in the OS store — Secret Service, Keychain, Credential
+        <dd>Secrets live in the OS store: Secret Service, Keychain, Credential
           Manager. The config holds a reference like <code>secret:openrouter</code>,
           never the value.</dd>
       </div>
@@ -290,13 +293,6 @@
   <p class="foot-note">Pre-release software. Expect rough edges.</p>
 </footer>
 
-<script type="importmap">
-{
-  "imports": {
-    "three": "./vendor/three.module.js"
-  }
-}
-</script>
 <script src="vendor/motion.js"></script>
 <script type="module" src="main.js"></script>
 <script src="themes.js"></script>
