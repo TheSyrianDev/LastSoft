@@ -439,110 +439,35 @@ main > section {
   max-width: 560px;
   border: 1px solid var(--hair);
   background:
-    radial-gradient(70% 58% at 50% 26%, var(--glow), transparent 72%),
+    radial-gradient(70% 58% at 50% 30%, var(--glow), transparent 72%),
     var(--ground-2);
-  padding: 18px 18px 16px;
+  overflow: hidden;
 }
 
-.run-head {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin: 0 0 14px;
-  font-family: var(--mono);
-  font-size: 10.5px;
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
-  color: var(--muted);
-}
+.run-frame { position: relative; aspect-ratio: 1 / 1.04; }
 
-.run-live {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--accent);
-  animation: run-pulse 2.6s var(--ease) infinite;
+.run-frame::before,
+.run-frame::after {
+  content: "";
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  border: 1px solid var(--hair-strong);
+  z-index: 2;
 }
+.run-frame::before { top: 10px; left: 10px; border-right: 0; border-bottom: 0; }
+.run-frame::after { bottom: 10px; right: 10px; border-left: 0; border-top: 0; }
 
-@keyframes run-pulse {
-  0%   { box-shadow: 0 0 0 0 rgba(178, 194, 124, 0.55); }
-  70%  { box-shadow: 0 0 0 7px rgba(178, 194, 124, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(178, 194, 124, 0); }
+#run-canvas { display: block; position: absolute; inset: 0; width: 100%; height: 100%; }
+
+.run figcaption {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
 }
-
-.run-thread {
-  display: grid;
-  gap: 6px;
-  margin: 0 0 12px;
-  font-family: var(--mono);
-  font-size: 11.5px;
-  line-height: 1.5;
-}
-
-.run-line { margin: 0; color: var(--muted); }
-.run-line b { font-weight: 500; }
-.run-line.you b { color: var(--ink); }
-.run-line.agent b { color: var(--accent); }
-
-.run-tree { display: block; width: 100%; height: auto; overflow: visible; }
-
-.run-tree .edges path {
-  stroke: var(--hair-strong);
-  stroke-width: 1;
-  opacity: 0.85;
-  transition: stroke-dashoffset 700ms var(--ease);
-}
-
-.run-tree .node {
-  opacity: 0;
-  transform: translateY(5px);
-  transition: opacity 420ms var(--ease), transform 420ms var(--ease);
-}
-.run-tree .node.in { opacity: 1; transform: none; }
-
-.run-tree .node rect {
-  fill: var(--ground-3);
-  stroke: var(--hair-strong);
-  stroke-width: 1;
-}
-.run-tree .node text {
-  font-family: var(--mono);
-  font-size: 10.5px;
-  letter-spacing: 0.02em;
-  fill: var(--ink);
-}
-.run-tree .node.root rect { fill: var(--accent); stroke: none; }
-.run-tree .node.root text { fill: var(--on-accent); }
-.run-tree .node.made rect { stroke: var(--accent); stroke-dasharray: 3 3; }
-.run-tree .node.made text { fill: var(--accent); }
-
-.run-context {
-  margin-top: 12px;
-  padding-top: 11px;
-  border-top: 1px solid var(--hair);
-}
-
-.run-bar { height: 2px; background: var(--hair); overflow: hidden; margin-bottom: 8px; }
-.run-bar i {
-  display: block;
-  height: 100%;
-  width: 6%;
-  background: var(--accent);
-  transition: width 900ms var(--ease);
-}
-
-.run-readout {
-  margin: 0;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  font-family: var(--mono);
-  font-size: 11.5px;
-  letter-spacing: 0.02em;
-  color: var(--muted);
-}
-.run-readout .run-n { color: var(--ink); font-weight: 500; }
-.run-readout .run-suffix { color: var(--accent); }
 
 /* ----------------------------------------------------------------- the team */
 .crew {

@@ -1,74 +1,157 @@
-// Fig. 1 is the thing the product actually is: a core, the departments under
-// it, the workers in those departments, and the two parts that feed it — the
-// engine around the outside and the downloader below. Particles run the edges
-// the way a goal runs through the team.
+// Fig. 1 is the team the agent builds: a project manager at the core, a
+// random number of departments around it, and a random number of workers
+// around each. Particles run the edges the way a goal runs through the team.
 
 window.__lastsoftMotion = false;
 
 const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-/* ------------------------------------------------------------------ run */
-function run() {
-  const panel = document.getElementById("run");
-  if (!panel) return;
+/* ------------------------------------------------------------------ figure */
+/* The team as a 3D structure: a project manager at the core, a random number
+   of departments around it, and a random number of workers around each. */
+async function figure() {
+  const canvas = document.getElementById("run-canvas");
+  if (!canvas) return;
 
-  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const nodes = [...panel.querySelectorAll(".node")];
-  const edges = [...panel.querySelectorAll(".edges path")];
-  const bar = panel.querySelector(".run-bar i");
-  const num = panel.querySelector(".run-n");
-  const suffix = panel.querySelector(".run-suffix");
-
-  edges.forEach((path) => {
-    const len = path.getTotalLength();
-    path.style.strokeDasharray = String(len);
-    path.style.strokeDashoffset = reduce ? "0" : String(len);
-  });
-
-  if (reduce) {
-    nodes.forEach((n) => n.classList.add("in"));
-    if (bar) bar.style.width = "6%";
+  let THREE;
+  try {
+    THREE = await import("./vendor/three.module.js");
+  } catch {
     return;
   }
 
-  const io = new IntersectionObserver(
-    (entries) => {
-      if (!entries.some((e) => e.isIntersecting)) return;
-      io.disconnect();
-      nodes.forEach((n, i) => {
-        n.style.transitionDelay = 140 + i * 95 + "ms";
-        n.classList.add("in");
-      });
-      edges.forEach((p, i) => {
-        p.style.transitionDelay = 300 + i * 130 + "ms";
-        p.style.strokeDashoffset = "0";
-      });
-      cycle();
-    },
-    { margin: "0px 0px -12% 0px" }
-  );
-  io.observe(panel);
-
-  /* The context cycle: fill, compress, unpack, repeat. */
-  let timer = null;
-  function cycle() {
-    const seq = [
-      { w: "100%", n: "1.2B", s: "\u00b7 reading it all", t: 3600 },
-      { w: "6%",   n: "8k",   s: "\u00b7 compressed", t: 2400 },
-      { w: "100%", n: "1.2B", s: "\u00b7 unpacked", t: 1800 },
-    ];
-    let i = 0;
-    const step = () => {
-      const c = seq[i % seq.length];
-      i += 1;
-      if (bar) bar.style.width = c.w;
-      if (num) num.textContent = c.n;
-      if (suffix) suffix.textContent = c.s;
-      panel.dataset.phase = String(i % seq.length);
-      timer = setTimeout(step, c.t);
-    };
-    timer = setTimeout(step, 1200);
+  let renderer;
+  try {
+    renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+  } catch {
+    return;
   }
+  renderer.setClearColor(0x000000, 0);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 100);
+  camera.position.set(0, 2.0, 9.2);
+  camera.lookAt(0, -0.2, 0);
+
+  const root = new THREE.Group();
+  root.rotation.x = -0.42;
+  scene.add(root);
+
+  const read = (name, fallback) => {
+    const v = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+    return v || fallback;
+  };
+
+  const materials = {
+    core: new THREE.MeshBasicMaterial({ color: read("--accent", "#b2c27c") }),
+    dept: new THREE.MeshBasicMaterial({ color: read("--accent-2", "#e0a050") }),
+    leaf: new THREE.MeshBasicMaterial({ color: read("--leaf", "#93a563") }),
+    edge: new THREE.LineBasicMaterial({ color: read("--ink", "#ece6d7"), transparent: true, opacity: 0.2 }),
+    dust: new THREE.PointsMaterial({
+      color: read("--accent", "#b2c27c"),
+      size: 0.06,
+      transparent: true,
+      opacity: 0.95,
+      depthWrite: false,
+    }),
+  };
+
+  const rand = (a, b) => a + Math.random() * (b - a);
+  const DEPTS = 3 + Math.floor(Math.random() * 4); // 3..6 departments
+  const RING = 2.2;
+
+  const core = new THREE.Mesh(new THREE.SphereGeometry(0.5, 32, 32), materials.core);
+  root.add(core);
+  const halo = new THREE.Mesh(
+    new THREE.SphereGeometry(0.78, 32, 32),
+    new THREE.MeshBasicMaterial({ color: read("--accent", "#b2c27c"), transparent: true, opacity: 0.13 })
+  );
+  root.add(halo);
+
+  const edges = [];
+
+  for (let i = 0; i < DEPTS; i++) {
+    const a = (i / DEPTS) * Math.PI * 2 + rand(-0.14, 0.14);
+    const d = new THREE.Vector3(Math.cos(a) * RING, rand(-1.0, 1.0), Math.sin(a) * RING);
+    const dept = new THREE.Mesh(new THREE.SphereGeometry(0.24, 20, 20), materials.dept);
+    dept.position.copy(d);
+    root.add(dept);
+    edges.push([new THREE.Vector3(0, 0, 0), d]);
+
+    const workers = 1 + Math.floor(Math.random() * 5); // 1..5 workers each
+    for (let w = 0; w < workers; w++) {
+      const wa = (w / workers) * Math.PI * 2 + rand(-0.35, 0.35);
+      const p = new THREE.Vector3(
+        d.x + Math.cos(wa) * rand(0.85, 1.1),
+        d.y + rand(-0.75, 0.75),
+        d.z + Math.sin(wa) * rand(0.95, 1.3)
+      );
+      const worker = new THREE.Mesh(new THREE.SphereGeometry(0.12, 14, 14), materials.leaf);
+      worker.position.copy(p);
+      root.add(worker);
+      edges.push([d, p]);
+    }
+  }
+
+  const edgePositions = [];
+  edges.forEach(([a, b]) => edgePositions.push(a.x, a.y, a.z, b.x, b.y, b.z));
+  const edgeGeometry = new THREE.BufferGeometry();
+  edgeGeometry.setAttribute("position", new THREE.Float32BufferAttribute(edgePositions, 3));
+  root.add(new THREE.LineSegments(edgeGeometry, materials.edge));
+
+  const particles = [];
+  edges.forEach((e, i) => {
+    for (let k = 0; k < 2; k++) particles.push({ e: i, t: Math.random(), s: rand(0.1, 0.28) });
+  });
+  const dustGeo = new THREE.BufferGeometry();
+  dustGeo.setAttribute("position", new THREE.Float32BufferAttribute(new Float32Array(particles.length * 3), 3));
+  const dust = new THREE.Points(dustGeo, materials.dust);
+  root.add(dust);
+
+  function resize() {
+    const box = canvas.parentElement.getBoundingClientRect();
+    if (!box.width || !box.height) return;
+    renderer.setSize(box.width, box.height, false);
+    camera.aspect = box.width / box.height;
+    camera.updateProjectionMatrix();
+  }
+  resize();
+  window.addEventListener("resize", resize);
+
+  new MutationObserver(() => {
+    materials.core.color.set(read("--accent", "#b2c27c"));
+    materials.dept.color.set(read("--accent-2", "#e0a050"));
+    materials.leaf.color.set(read("--leaf", "#93a563"));
+    materials.edge.color.set(read("--ink", "#ece6d7"));
+    materials.dust.color.set(read("--accent", "#b2c27c"));
+    halo.material.color.set(read("--accent", "#b2c27c"));
+  }).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme", "style"] });
+
+  const clock = new THREE.Clock();
+  function frame() {
+    const dt = Math.min(clock.getDelta(), 0.05);
+    const t = clock.elapsedTime;
+
+    root.rotation.y += dt * 0.16;
+    root.position.y = Math.sin(t * 0.5) * 0.06;
+    core.scale.setScalar(1 + Math.sin(t * 1.6) * 0.045);
+
+    const pos = dust.geometry.attributes.position;
+    for (let i = 0; i < particles.length; i++) {
+      const p = particles[i];
+      p.t += dt * p.s;
+      if (p.t > 1) p.t -= 1;
+      const [a, b] = edges[p.e];
+      pos.setXYZ(i, a.x + (b.x - a.x) * p.t, a.y + (b.y - a.y) * p.t, a.z + (b.z - a.z) * p.t);
+    }
+    pos.needsUpdate = true;
+
+    renderer.render(scene, camera);
+    if (!reduce) requestAnimationFrame(frame);
+  }
+  frame();
 }
 
 /* -------------------------------------------------------------- reveals */
@@ -132,6 +215,6 @@ function copies() {
   }
 }
 
-run();
+figure().catch((e) => console.warn("hero scene:", e));
 reveals();
 copies();
