@@ -28,15 +28,18 @@
 </script>
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="themes.css">
-<script type="importmap">
-  { "imports": { "three": "./vendor/three.module.js" } }
-</script>
 <script>
   document.documentElement.classList.add('motion');
   addEventListener('load', function () {
     if (!window.__lastsoftMotion) document.documentElement.classList.remove('motion');
   });
 </script>
+<noscript>
+  <style>
+    .run-tree .node { opacity: 1; transform: none; }
+    .run-tree .edges path { stroke-dashoffset: 0 !important; }
+  </style>
+</noscript>
 </head>
 <body>
 
@@ -100,16 +103,43 @@
       </dl>
     </div>
 
-    <figure class="figure" id="assembly">
-      <div class="figure-frame">
-        <canvas id="figure-canvas" aria-hidden="true"></canvas>
-        <svg class="figure-dim" viewBox="0 0 60 320" preserveAspectRatio="none" aria-hidden="true">
-          <line x1="20" y1="16" x2="20" y2="304" stroke-dasharray="3 5"/>
-          <line x1="14" y1="16" x2="26" y2="16"/>
-          <line x1="14" y1="304" x2="26" y2="304"/>
-        </svg>
+    <figure class="run" id="run">
+      <figcaption class="run-head">
+        <span class="run-live" aria-hidden="true"></span>
+        one goal, one team
+      </figcaption>
+
+      <div class="run-thread">
+        <p class="run-line you"><b>you</b> build me a studio for the project</p>
+        <p class="run-line agent"><b>agent</b> done. a project manager, two departments, workers built from scratch.</p>
       </div>
-      <figcaption>Fig. 1: a goal moving through the team: core, departments, workers; the engine around them; models arriving from below.</figcaption>
+
+      <svg class="run-tree" viewBox="0 0 520 206" role="img"
+           aria-label="The chain: you, a personal agent, a project manager, two department managers, and one worker each.">
+        <g class="edges" fill="none">
+          <path d="M260 32 L260 50"/>
+          <path d="M260 72 L260 90"/>
+          <path d="M260 112 C260 124 150 118 150 130"/>
+          <path d="M260 112 C260 124 370 118 370 130"/>
+          <path d="M150 152 L150 170"/>
+          <path d="M370 152 L370 170"/>
+        </g>
+        <g class="node root"><g transform="translate(238,10)"><rect width="44" height="22" rx="6"/><text x="22" y="15">You</text></g></g>
+        <g class="node"><g transform="translate(204,50)"><rect width="112" height="22" rx="6"/><text x="56" y="15">Personal Agent</text></g></g>
+        <g class="node"><g transform="translate(200,90)"><rect width="120" height="22" rx="6"/><text x="60" y="15">Project Manager</text></g></g>
+        <g class="node made"><g transform="translate(74,130)"><rect width="150" height="22" rx="6"/><text x="75" y="15">Dept manager · Build</text></g></g>
+        <g class="node made"><g transform="translate(284,130)"><rect width="170" height="22" rx="6"/><text x="85" y="15">Dept manager · Research</text></g></g>
+        <g class="node made"><g transform="translate(120,170)"><rect width="60" height="22" rx="6"/><text x="30" y="15">Worker</text></g></g>
+        <g class="node made"><g transform="translate(340,170)"><rect width="60" height="22" rx="6"/><text x="30" y="15">Worker</text></g></g>
+      </svg>
+
+      <div class="run-context">
+        <div class="run-bar"><i></i></div>
+        <p class="run-readout">
+          <span>context <b class="run-n">8k</b> tok</span>
+          <span class="run-suffix">· compressed to 8k</span>
+        </p>
+      </div>
     </figure>
   </section>
 
