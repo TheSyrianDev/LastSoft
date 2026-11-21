@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>The Last AI suite — documentation</title>
+<title>The Last AI suite - documentation</title>
 <meta name="description" content="Documentation for the Last AI suite: Last AI, the LastHarness core, the LastEngine inference engine and the Model-Downloader downloader. What each part does, what it does not do, and how they fit together.">
 <meta name="theme-color" content="#0b120e">
 <link rel="icon" href="../assets/lastai.png">
@@ -92,7 +92,7 @@
         </tr>
         <tr>
           <td><a href="harness.html">LastHarness</a></td>
-          <td>The turn loop and everything around it — providers, tools with permissions, memory, team, MCP. No downloader, no engine.</td>
+          <td>The turn loop and everything around it: providers, tools with permissions, memory, team, MCP. No downloader, no engine.</td>
           <td>own repository</td>
         </tr>
         <tr>
@@ -114,7 +114,7 @@
       (<code>lastaid</code>) listens on <code>127.0.0.1</code> and holds the
       state; the desktop app, the terminal client and paired browsers are thin
       clients of that one HTTP API. Models arrive through Model-Downloader and are served
-      either by a local runtime you already run, or — later — by LastEngine
+      either by a local runtime you already run, or, later, by LastEngine
       behind the same provider interface.
     </p>
 <pre><code>desktop app   terminal (lai)   paired browser   messaging channels
@@ -171,7 +171,7 @@ mdl download Qwen/Qwen3-0.6B --include "*.gguf" --local-dir ~/AI/Models</code></
       <li><strong>Stand-alone parts.</strong> The engine runs without the app, the harness runs against any OpenAI-compatible server, and the downloader is just a downloader.</li>
       <li><strong>Say the version.</strong> Every page and README names the release and the gaps. Pre-release means pre-release.</li>
       <li><strong>Nothing hidden in the prompt.</strong> Learned behaviour is appended in separate blocks, versioned, and applied without asking is logged.</li>
-      <li><strong>Secrets stay in the OS store</strong> — Secret Service, Keychain, Credential Manager. Config holds a reference, never the value.</li>
+      <li><strong>Secrets stay in the OS store</strong>: Secret Service, Keychain, Credential Manager. Config holds a reference, never the value.</li>
     </ul>
 
     <div class="note">

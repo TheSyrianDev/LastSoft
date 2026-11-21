@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>LastHarness — documentation</title>
-<meta name="description" content="LastHarness documented: the core, the clients, the provider layer, tool permissions, memory, the team loop and the spend ledger — with no downloader and no inference engine of its own.">
+<title>LastHarness - documentation</title>
+<meta name="description" content="LastHarness documented: the core, the clients, the provider layer, tool permissions, memory, the team loop and the spend ledger, with no downloader and no inference engine of its own.">
 <meta name="theme-color" content="#0b120e">
 <link rel="icon" href="../assets/lastai.png">
 <link rel="preconnect" href="https://cdn.fontshare.com" crossorigin>
@@ -94,7 +94,7 @@
       <thead><tr><th>Piece</th><th>Responsibility</th></tr></thead>
       <tbody>
         <tr><td>Core</td><td>State, the turn loop, the HTTP API on loopback, the token the clients present.</td></tr>
-        <tr><td>Clients</td><td>A terminal app, a desktop app, paired browser pages and messaging channels — all thin.</td></tr>
+        <tr><td>Clients</td><td>A terminal app, a desktop app, paired browser pages and messaging channels, all thin.</td></tr>
         <tr><td>Provider layer</td><td>Local runtimes and cloud APIs behind one shape. Keys by reference, never stored in config.</td></tr>
         <tr><td>Tools</td><td>File reads and writes, shell, search, MCP servers, each behind a tiered permission rule.</td></tr>
         <tr><td>Memory</td><td>Markdown notes plus a database index. Files are the truth; the index is a cache.</td></tr>
@@ -120,7 +120,7 @@
     <ol>
       <li><strong>Prompt assembly.</strong> Base prompt first, then the learned blocks (rules, style, skills) in order, then the memory this task needs. The base prompt is not rewritten; learned text is appended and every version is kept.</li>
       <li><strong>Provider call.</strong> One request per step, to the model the worker is assigned. Streaming to whichever client asked.</li>
-      <li><strong>Tool gate.</strong> Every tool call passes the rule for its tier — free read, ask-once write, always-ask for anything that leaves the machine or destroys data.</li>
+      <li><strong>Tool gate.</strong> Every tool call passes the rule for its tier: free read, ask-once write, always-ask for anything that leaves the machine or destroys data.</li>
       <li><strong>Effects and spend.</strong> Tool results are appended; provider cost lands in the ledger; the machine lock is taken when a job needs the GPU alone.</li>
       <li><strong>Check and continue.</strong> The step is checked against its goal. Failures retry, move to another model, get done by the lead, or come back to you with the attempts.</li>
     </ol>

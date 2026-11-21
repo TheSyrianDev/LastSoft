@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Model-Downloader — documentation</title>
-<meta name="description" content="Model-Downloader documented: models and datasets from the Hugging Face Hub, ModelScope and (opt-in) Pirate Face — resumable segmented transfers, verification, a background queue and token handling.">
+<title>Model-Downloader - documentation</title>
+<meta name="description" content="Model-Downloader documented: models and datasets from the Hugging Face Hub, ModelScope and (opt-in) Pirate Face, resumable segmented transfers, verification, a background queue and token handling.">
 <meta name="theme-color" content="#0b120e">
 <link rel="icon" href="../assets/lastai.png">
 <link rel="preconnect" href="https://cdn.fontshare.com" crossorigin>
@@ -75,7 +75,7 @@
     <h1>Model-Downloader</h1>
     <p class="lede">
       A downloader in Rust for models and datasets, wherever they live: the
-      Hugging Face Hub, ModelScope, and — opt-in, over BitTorrent — Pirate Face.
+      Hugging Face Hub, ModelScope, and, opt-in over BitTorrent, Pirate Face.
       Segmented, resumable transfers with verification, a queue that keeps
       running after you close the terminal, and no opinion about what you do
       with the files.
@@ -123,7 +123,7 @@ mdl download AI-ModelScope/ShareGPT-4o --source modelscope --type dataset --dry-
     <p>
       <code>MODELSCOPE_API</code> points the ModelScope source at a mirror, and
       <code>MODELSCOPE_API_TOKEN</code> (or <code>MODELSCOPE_TOKEN</code>) is
-      sent for private repositories — never to a host other than ModelScope's
+      sent for private repositories, never to a host other than ModelScope's
       own. A ModelScope file with no published digest cannot be verified, so it
       goes to <code>--local-dir</code> but not into the cache.
     </p>

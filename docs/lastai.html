@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Last AI — documentation</title>
+<title>Last AI - documentation</title>
 <meta name="description" content="Install and run Last AI: the desktop app, the lai terminal client and the lastaid core. Providers, models, memory, the team of departments, permissions and where files live.">
 <meta name="theme-color" content="#0b120e">
 <link rel="icon" href="../assets/lastai.png">
@@ -120,7 +120,7 @@ lastai-gui      # or the desktop app, with the core running</code></pre>
     <p>
       To keep the core alive across logins: <code>lh service preview</code>, then
       <code>lh service install</code>. That writes a systemd <em>user</em>
-      service — no sudo — so closing the terminal never stops the core.
+      service, no sudo, so closing the terminal never stops the core.
     </p>
 
     <h2>Providers and models</h2>
@@ -133,8 +133,8 @@ lastai-gui      # or the desktop app, with the core running</code></pre>
     </p>
     <p>
       The same page searches Hugging Face for GGUF files and groups the results by
-      whether they fit this machine's memory — <em>Fits in memory</em>,
-      <em>Tight</em>, <em>Too big</em>, <em>Size not known</em> — then downloads
+      whether they fit this machine's memory (<em>Fits in memory</em>,
+      <em>Tight</em>, <em>Too big</em>, <em>Size not known</em>), then downloads
       into <code>~/AI/Models/</code>. A model your llama-swap router does not serve
       yet gets a <em>Run</em> button that backs up the router files, validates the
       matrix and restarts the router. Models already served show <em>Use in chat</em>.
@@ -150,7 +150,7 @@ lastai-gui      # or the desktop app, with the core running</code></pre>
 
     <h2>Memory, learning, and the team</h2>
     <ul>
-      <li><strong>Memory</strong> is Markdown notes under <code>~/.local/share/lastai/memory/</code>. Read them, edit them, delete them — the core treats files as truth.</li>
+      <li><strong>Memory</strong> is Markdown notes under <code>~/.local/share/lastai/memory/</code>. Read them, edit them, delete them. The core treats files as truth.</li>
       <li><strong>Learning</strong> produces rules, style notes and skills. Each one waits for approval; what gets applied without asking is logged so you can undo it.</li>
       <li><strong>Team</strong> is departments of role workers, each a Markdown file: lead, members, model, tools, memory slice. Give a department a goal with <code>lh team run</code> and its lead plans, its workers run in parallel up to your limit, and the lead checks each result before you see it. Departments nest; a sub-department is a step whose failure comes back as a failed step.</li>
       <li><strong>Permissions</strong> are tiered: reads are free, writes ask once, anything risky always asks. Sensitive notes and rules are only ever used with a model on this machine.</li>
@@ -167,7 +167,7 @@ lastai-gui      # or the desktop app, with the core running</code></pre>
         <tr><td><code>lh mcp</code></td><td>MCP servers. Nothing runs until you approve it.</td></tr>
         <tr><td><code>lh trust &lt;folder&gt;</code></td><td>Which project folders may bring their own MCP servers.</td></tr>
         <tr><td><code>lh devices</code></td><td>Pair a browser with a PIN, list, remove.</td></tr>
-        <tr><td><code>lh channels</code></td><td>Telegram, Matrix, Slack, Signal — off until switched on.</td></tr>
+        <tr><td><code>lh channels</code></td><td>Telegram, Matrix, Slack, Signal, off until switched on.</td></tr>
         <tr><td><code>lh export</code> / <code>lh import</code></td><td>Move memory, rules, style, roles and departments.</td></tr>
         <tr><td><code>lh service</code></td><td>Start the core at login.</td></tr>
       </tbody>
@@ -192,7 +192,7 @@ lastai-gui      # or the desktop app, with the core running</code></pre>
       <li>A phone app, and any final visual design (no logo or brand colours inside the app).</li>
       <li>Signed installers and updates; crash reports are prepared but not sent.</li>
       <li>The hosted relay, subscriptions, memory sync.</li>
-      <li>Agents loading and unloading local models on their own — they can list models, pick one among your providers, and propose a new provider for you to approve.</li>
+      <li>Agents loading and unloading local models on their own. They can list models, pick one among your providers, and propose a new provider for you to approve.</li>
       <li>Installing a plugin from a link (folders only), and project-level skills.</li>
       <li>Messaging channels tested against real accounts; they run against mocks.</li>
     </ul>

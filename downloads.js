@@ -24,9 +24,9 @@ function bytes(n) {
 }
 
 function formatDate(iso) {
-  if (!iso) return "—";
+  if (!iso) return "unknown";
   const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return "—";
+  if (Number.isNaN(d.getTime())) return "unknown";
   return d.toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" });
 }
 
@@ -43,7 +43,7 @@ const OS_LABEL = {
   linux: "Linux · the script checks your distribution",
   windows: "Windows",
   macos: "macOS",
-  android: "Android — no build for this",
+  android: "Android: no build for this",
   other: "Unrecognised system",
 };
 
@@ -77,7 +77,7 @@ async function release() {
     rel = list?.[0];
   } catch {
     if (versionOut) versionOut.textContent = "on the release page";
-    if (dateOut) dateOut.textContent = "—";
+    if (dateOut) dateOut.textContent = "unknown";
     return;
   }
 

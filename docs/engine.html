@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>LastEngine — documentation</title>
+<title>LastEngine - documentation</title>
 <meta name="description" content="LastEngine documented: a clean-room Rust inference engine with one backend trait, a hardware probe, an OpenAI-compatible chat server with stats, and benchmarks that decide what stays.">
 <meta name="theme-color" content="#0b120e">
 <link rel="icon" href="../assets/lastai.png">
@@ -76,7 +76,7 @@
     <p class="lede">
       Inference without a framework under it. Rust, a clean room, and a target
       that is deliberately small: mixture-of-experts models on the kind of GPU
-      most people actually have — a 4&nbsp;GB laptop card first.
+      most people actually have: a 4&nbsp;GB laptop card first.
     </p>
 
     <div class="note">
@@ -84,14 +84,14 @@
         Measured on Linux x86_64 with an NVIDIA card (sm_86, RTX 3050 Laptop).
         The Windows build compiles in CI but has not run a model on a Windows
         GPU. Treat it as an engine to watch, not the engine behind the studio
-        yet — Last AI talks to llama.cpp-family servers today.
+        yet. Last AI talks to llama.cpp-family servers today.
       </p>
     </div>
 
     <h2>One trait, several backends</h2>
     <p>
       Everything is written against a single backend trait, so the rest of the
-      engine — model loading, sampling, the server, benchmarks — never learns
+      engine (model loading, sampling, the server, benchmarks) never learns
       which hardware it is on. At startup the engine probes the machine and
       picks the strongest backend that can actually work.
     </p>
@@ -120,7 +120,7 @@ lastengine probe --json   # the same, explicitly</code></pre>
     <h2>The server speaks llama.cpp's dialect</h2>
     <p>
       The engine runs as a server, so anything that speaks OpenAI chat to a local
-      server can use it — including the harness. Responses carry a
+      server can use it, including the harness. Responses carry a
       llama.cpp-style <code>timings</code> object, and there are endpoints for
       watching work as it happens:
     </p>
@@ -142,7 +142,7 @@ lastengine probe --json   # the same, explicitly</code></pre>
 
     <h2>Where it goes next</h2>
     <ol>
-      <li>Batched decode, because the backend lock serializes requests today — one generation at a time.</li>
+      <li>Batched decode, because the backend lock serializes requests today, one generation at a time.</li>
       <li>Expert caching for MoE models, which is the whole reason for the small-card target.</li>
       <li>Vulkan, then Metal, behind the same trait.</li>
       <li>An embeddable library crate next to the server, so the harness can link the engine instead of starting it.</li>
