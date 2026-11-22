@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import Aurora from "./fx/Aurora.jsx";
 import Field from "./fx/Field.jsx";
 import HeroScene from "./fx/HeroScene.jsx";
 
@@ -111,7 +110,7 @@ export default function App() {
 
   return (
     <>
-      <Aurora />
+      <div className="bg-aurora" aria-hidden="true" />
       <Field />
 
       <a className="skip" href="#main">

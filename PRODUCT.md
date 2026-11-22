@@ -13,10 +13,24 @@ web
 
 ## Stack
 
-Static HTML, CSS and JavaScript, no build step, served by GitHub Pages. No
-framework: the site must stay readable as source and load without a bundler.
-Libraries are allowed where they earn their weight (Three.js for the hero,
-Motion One for animation), loaded as ES modules.
+Two pipelines, one site:
+
+- **Static (what is live today).** Plain HTML, CSS and JavaScript in the
+  repository root, served by GitHub Pages with no build step. Three.js is
+  vendored as an ES module; the pages stay readable as source and load without
+  a bundler.
+- **React (`app/`, built but not yet the deploy target).** Vite + React +
+  TypeScript-free JSX, three.js and GSAP as npm dependencies, built to
+  `app/dist` by `.github/workflows/deploy.yml` and published with
+  `actions/deploy-pages`. The site CSS stays canonical at the repository root
+  and is copied into `app/src` before each build, so both pipelines share it.
+
+Switching the live site to the React build is a GitHub Pages setting change
+("Source: GitHub Actions"), not a code change. Until then the workflow is
+inert and the static pages stay live.
+
+Libraries are allowed where they earn their weight (Three.js for the hero and
+the background field, GSAP for scroll choreography), loaded as ES modules.
 
 ## Users
 
