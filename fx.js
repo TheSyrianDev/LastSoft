@@ -21,6 +21,76 @@
   }
 
   const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  /* Shared GLSL for the aurora background. */
+  const AURORA_VERT = `
+    varying vec2 vUv;
+    void main() {
+      vUv = uv;
+      gl_Position = vec4(position.xy, 0.0, 1.0);
+    }
+  `;
+
+  const AURORA_FRAG = `
+    precision highp float;
+    varying vec2 vUv;
+    uniform vec2 uRes;
+    uniform float uTime;
+    uniform vec2 uPointer;
+    uniform vec3 uA;
+    uniform vec3 uB;
+    uniform vec3 uC;
+
+    float hash(vec2 p) {
+      return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
+    }
+    float noise(vec2 p) {
+      vec2 i = floor(p);
+      vec2 f = fract(p);
+      vec2 u = f * f * (3.0 - 2.0 * f);
+      return mix(
+        mix(hash(i), hash(i + vec2(1.0, 0.0)), u.x),
+        mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), u.x),
+        u.y
+      );
+    }
+    float fbm(vec2 p) {
+      float v = 0.0;
+      float a = 0.5;
+      for (int i = 0; i < 5; i++) {
+        v += a * noise(p);
+        p = p * 2.02 + 11.3;
+        a *= 0.5;
+      }
+      return v;
+    }
+    void main() {
+      vec2 uv = vUv;
+      float aspect = uRes.x / uRes.y;
+      vec2 p = (uv - 0.5) * vec2(aspect, 1.0) * 1.55;
+      float t = uTime * 0.012;
+
+      vec2 q = vec2(fbm(p + t), fbm(p - t * 0.8 + 4.3));
+      vec2 r = vec2(
+        fbm(p + 1.6 * q + vec2(1.7, 9.2) + 0.1 * t),
+        fbm(p + 1.6 * q + vec2(8.3, 2.8) - 0.08 * t)
+      );
+      float f = fbm(p + 2.0 * r);
+
+      vec3 col = mix(uA, uB, clamp(length(q) * 1.25, 0.0, 1.0));
+      col = mix(col, uC, clamp(length(r) * 1.05, 0.0, 1.0));
+
+      col *= 0.34 + 0.5 * f;
+
+      float v = smoothstep(1.3, 0.3, length(uv - 0.5));
+      col *= 0.62 + 0.38 * v;
+
+      float d = length((uv - uPointer) * vec2(aspect, 1.0));
+      col += uC * 0.18 * smoothstep(0.6, 0.0, d);
+
+      gl_FragColor = vec4(col, 1.0);
+    }
+  `;
+
   const token = (name, fallback) =>
     getComputedStyle(document.documentElement).getPropertyValue(name).trim() || fallback;
 
@@ -325,8 +395,8 @@
         window.addEventListener("resize", resize);
 
         const field = (x, y, t) =>
-          Math.sin(x * 0.0035 + t * 0.32) * Math.cos(y * 0.0031 - t * 0.27) +
-          0.55 * Math.sin((x + y) * 0.0019 + t * 0.17);
+          Math.sin(x * 0.0035 + t * 0.06) * Math.cos(y * 0.0031 - t * 0.05) +
+          0.55 * Math.sin((x + y) * 0.0019 + t * 0.03);
 
         window.addEventListener(
           "pointermove",
@@ -371,8 +441,8 @@
             prev[ix] = nx;
             prev[ix + 1] = ny;
             const sp = seeds[i];
-            let X = nx + vx * sp * 0.085;
-            let Y = ny + vy * sp * 0.085;
+            let X = nx + vx * sp * 0.018;
+            let Y = ny + vy * sp * 0.018;
             if (X < -1.06) X = 1.06;
             else if (X > 1.06) X = -1.06;
             if (Y < -1.06) Y = 1.06;
@@ -412,7 +482,74 @@
             requestAnimationFrame(loop);
           })();
         }
-      } else {
+      } else if (mode === "aurora") {
+        const scene = new THREE.Scene();
+        const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+        const uniforms = {
+          uRes: { value: new THREE.Vector2(1, 1) },
+          uTime: { value: 0 },
+          uPointer: { value: new THREE.Vector2(0.5, 0.5) },
+          uA: { value: new THREE.Color("#b2c27c") },
+          uB: { value: new THREE.Color("#e0a050") },
+          uC: { value: new THREE.Color("#93a563") },
+        };
+        scene.add(
+          new THREE.Mesh(
+            new THREE.PlaneGeometry(2, 2),
+            new THREE.ShaderMaterial({
+              uniforms,
+              vertexShader: AURORA_VERT,
+              fragmentShader: AURORA_FRAG,
+            })
+          )
+        );
+
+        function applyTheme() {
+          uniforms.uA.value.set(token("--accent", "#b2c27c"));
+          uniforms.uB.value.set(token("--accent-2", "#e0a050"));
+          uniforms.uC.value.set(token("--leaf", "#93a563"));
+        }
+        applyTheme();
+
+        function resize() {
+          const w = window.innerWidth;
+          const h = window.innerHeight;
+          if (!w || !h) return;
+          renderer.setSize(w, h, false);
+          uniforms.uRes.value.set(w, h);
+        }
+        resize();
+        window.addEventListener("resize", resize);
+
+        const pointer = { x: 0.5, y: 0.5 };
+        window.addEventListener(
+          "pointermove",
+          (e) => {
+            pointer.x = e.clientX / window.innerWidth;
+            pointer.y = 1 - e.clientY / window.innerHeight;
+          },
+          { passive: true }
+        );
+
+        const observer = new MutationObserver(applyTheme);
+        observer.observe(document.documentElement, {
+          attributes: true,
+          attributeFilter: ["data-theme", "style"],
+        });
+
+        const target = new THREE.Vector2(0.5, 0.5);
+        const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        const clock = new THREE.Clock();
+        const loop = () => {
+          uniforms.uTime.value = clock.getElapsedTime();
+          target.set(pointer.x, pointer.y);
+          uniforms.uPointer.value.lerp(target, 0.05);
+          renderer.render(scene, camera);
+          if (!reduce) requestAnimationFrame(loop);
+        };
+        loop();
+      }
+
       const COUNT = 80;
       const LINK = 9.5;
       const MAX_LINKS = 900;
@@ -565,7 +702,6 @@
           paint(clock.getElapsedTime());
           requestAnimationFrame(loop);
         })();
-      }
       }
     }
   }

@@ -231,7 +231,7 @@ async function figure() {
     const dt = Math.min(clock.getDelta(), 0.05);
     const t = clock.elapsedTime;
 
-    root.rotation.y += dt * 0.14;
+    root.rotation.y += dt * 0.045;
     root.position.y = Math.sin(t * 0.5) * 0.12;
 
     const pos = dust.geometry.attributes.position;
