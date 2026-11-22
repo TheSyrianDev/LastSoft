@@ -442,6 +442,8 @@ main > section {
   border: 1px solid var(--hair);
   background:
     radial-gradient(70% 58% at 50% 30%, var(--glow), transparent 72%),
+    repeating-linear-gradient(0deg, rgba(128,138,128,0.32) 0 1px, transparent 1px 28px),
+    repeating-linear-gradient(90deg, rgba(128,138,128,0.32) 0 1px, transparent 1px 28px),
     var(--ground-2);
   overflow: hidden;
 }

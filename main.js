@@ -32,18 +32,27 @@ async function figure() {
   const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 100);
-  camera.position.set(0, 2.0, 9.2);
-  camera.lookAt(0, -0.2, 0);
-
-  const root = new THREE.Group();
-  root.rotation.x = -0.42;
-  scene.add(root);
+  camera.position.set(0, 1.1, 9.4);
+  camera.lookAt(0, -0.1, 0);
 
   const read = (name, fallback) =>
     getComputedStyle(document.documentElement).getPropertyValue(name).trim() || fallback;
 
-  /* The theme's own three accents become gradient stops, so the structure
-     carries the same colours as the rest of the site in that palette. */
+  /* soft round sprite, shared by every node and particle */
+  const glowTexture = (() => {
+    const c = document.createElement("canvas");
+    c.width = c.height = 128;
+    const g = c.getContext("2d");
+    const grad = g.createRadialGradient(64, 64, 0, 64, 64, 64);
+    grad.addColorStop(0, "rgba(255,255,255,1)");
+    grad.addColorStop(0.3, "rgba(255,255,255,0.6)");
+    grad.addColorStop(1, "rgba(255,255,255,0)");
+    g.fillStyle = grad;
+    g.fillRect(0, 0, 128, 128);
+    return new THREE.CanvasTexture(c);
+  })();
+
+  /* the theme's own three accents, used as gradient stops */
   const stops = [
     new THREE.Color(read("--accent", "#b2c27c")),
     new THREE.Color(read("--accent-2", "#e0a050")),
@@ -57,49 +66,73 @@ async function figure() {
 
   const rand = (a, b) => a + Math.random() * (b - a);
   const DEPTS = 3 + Math.floor(Math.random() * 3); // 3..5 departments
-  const RING = 2.7;
-  const MAXD = RING + 1.5;
+  const RING = 3.1;
+  const MAXD = RING + 2.1;
 
-  const nodeMaterial = (color) => new THREE.MeshBasicMaterial({ color: color.clone() });
+  const root = new THREE.Group();
+  root.rotation.x = -0.34;
+  root.scale.setScalar(0.55);
+  scene.add(root);
+
+  /* soft cast shadow under the whole structure, so it reads as floating */
+  const shadow = new THREE.Sprite(
+    new THREE.SpriteMaterial({
+      map: glowTexture,
+      color: stops[0].clone(),
+      transparent: true,
+      opacity: 0.16,
+      depthWrite: false,
+    })
+  );
+  shadow.scale.set(10, 2.4, 1);
+  shadow.position.set(0, -2.4, -1.3);
+  root.add(shadow);
 
   const pts = [new THREE.Vector3(0, 0, 0)];
   const ts = [0];
   const cols = [ramp(0, new THREE.Color())];
   const meshes = [];
 
-  const core = new THREE.Mesh(new THREE.SphereGeometry(0.5, 32, 32), nodeMaterial(cols[0]));
-  root.add(core);
-  meshes.push(core);
-
-  const edges = [];
-
-  const addNode = (pos, radius, t) => {
+  const addNode = (pos, size, t) => {
     pts.push(pos.clone());
     ts.push(t);
     cols.push(ramp(t, new THREE.Color()));
     const i = pts.length - 1;
-    const mesh = new THREE.Mesh(new THREE.SphereGeometry(radius, 20, 20), nodeMaterial(cols[i]));
-    mesh.position.copy(pos);
-    root.add(mesh);
-    meshes.push(mesh);
+    const m = new THREE.Sprite(
+      new THREE.SpriteMaterial({
+        map: glowTexture,
+        color: cols[i].clone(),
+        transparent: true,
+        opacity: 0.95,
+        depthWrite: false,
+      })
+    );
+    m.position.copy(pos);
+    m.scale.setScalar(size);
+    root.add(m);
+    meshes.push(m);
     return i;
   };
 
+  addNode(new THREE.Vector3(0, 0, 0), 0.92, 0);
+
+  const edges = [];
+
   for (let i = 0; i < DEPTS; i++) {
-    const a = (i / DEPTS) * Math.PI * 2 + rand(-0.14, 0.14);
-    const d = new THREE.Vector3(Math.cos(a) * RING, rand(-1.0, 1.0), Math.sin(a) * RING);
-    const di = addNode(d, 0.26, 0.12 + (d.length() / MAXD) * 0.3 + rand(-0.04, 0.04));
+    const a = (i / DEPTS) * Math.PI * 2 + rand(-0.18, 0.18);
+    const d = new THREE.Vector3(Math.cos(a) * RING, rand(-1.3, 1.3), Math.sin(a) * RING);
+    const di = addNode(d, 0.6, 0.14 + (d.length() / MAXD) * 0.3 + rand(-0.05, 0.05));
     edges.push([0, di]);
 
-    const workers = 1 + Math.floor(Math.random() * 4); // 1..4 workers each
+    const workers = 1 + Math.floor(Math.random() * 3); // 1..3 workers each
     for (let w = 0; w < workers; w++) {
-      const wa = (w / workers) * Math.PI * 2 + rand(-0.35, 0.35);
+      const wa = (w / workers) * Math.PI * 2 + rand(-0.4, 0.4);
       const p = new THREE.Vector3(
-        d.x + Math.cos(wa) * rand(1.15, 1.45),
-        d.y + rand(-0.75, 0.75),
-        d.z + Math.sin(wa) * rand(1.15, 1.45)
+        d.x + Math.cos(wa) * rand(1.5, 1.9),
+        d.y + rand(-1.0, 1.0),
+        d.z + Math.sin(wa) * rand(1.5, 1.9)
       );
-      const wi = addNode(p, 0.13, 0.58 + (p.length() / (MAXD * 1.3)) * 0.4 + rand(-0.04, 0.04));
+      const wi = addNode(p, 0.32, 0.6 + (p.length() / (MAXD * 1.25)) * 0.38 + rand(-0.05, 0.05));
       edges.push([di, wi]);
     }
   }
@@ -119,7 +152,7 @@ async function figure() {
       new THREE.LineBasicMaterial({
         vertexColors: true,
         transparent: true,
-        opacity: 1,
+        opacity: 0.55,
         blending: THREE.AdditiveBlending,
         depthWrite: false,
       })
@@ -128,7 +161,7 @@ async function figure() {
 
   const particles = [];
   edges.forEach((e, i) => {
-    for (let k = 0; k < 3; k++) particles.push({ e: i, t: Math.random(), s: rand(0.1, 0.28) });
+    for (let k = 0; k < 2; k++) particles.push({ e: i, t: Math.random(), s: rand(0.1, 0.26) });
   });
   const dustGeo = new THREE.BufferGeometry();
   dustGeo.setAttribute("position", new THREE.Float32BufferAttribute(new Float32Array(particles.length * 3), 3));
@@ -136,7 +169,8 @@ async function figure() {
   const dust = new THREE.Points(
     dustGeo,
     new THREE.PointsMaterial({
-      size: 0.16,
+      size: 0.22,
+      map: glowTexture,
       vertexColors: true,
       transparent: true,
       opacity: 0.95,
@@ -174,6 +208,7 @@ async function figure() {
       edgeColors[k++] = cols[j].b;
     });
     edgeGeometry.attributes.color.needsUpdate = true;
+    shadow.material.color.copy(cols[0]);
   }).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme", "style"] });
 
   const clock = new THREE.Clock();
@@ -181,9 +216,8 @@ async function figure() {
     const dt = Math.min(clock.getDelta(), 0.05);
     const t = clock.elapsedTime;
 
-    root.rotation.y += dt * 0.16;
-    root.position.y = Math.sin(t * 0.5) * 0.06;
-    core.scale.setScalar(1 + Math.sin(t * 1.6) * 0.045);
+    root.rotation.y += dt * 0.14;
+    root.position.y = Math.sin(t * 0.5) * 0.12;
 
     const pos = dust.geometry.attributes.position;
     const col = dust.geometry.attributes.color;
