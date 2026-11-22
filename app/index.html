@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Last AI - the last AI studio you'll need</title>
+    <meta
+      name="description"
+      content="Last AI is a local-first AI studio that works as a team: your assistant hands bigger goals to a department, whose lead splits them across workers and checks the result. Built from three parts: the LastHarness harness, the LastEngine inference engine and the Model-Downloader downloader. No account, no cloud."
+    />
+    <meta name="theme-color" content="#0b120e" />
+    <link rel="icon" href="/LastSoft/assets/favicon-64.png" type="image/png" />
+    <link rel="preconnect" href="https://cdn.fontshare.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@700,800&f[]=switzer@400,500&display=swap"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap"
+    />
+    <script>
+      // Paint the theme before the first frame, so nothing flashes.
+      (function () {
+        try {
+          var root = document.documentElement;
+          var choice = localStorage.getItem("lastai-site-theme") || "auto";
+          if (choice !== "auto") {
+            root.dataset.theme = choice;
+            return;
+          }
+          var saved = localStorage.getItem("lastai-site-vars");
+          if (!saved) return;
+          var theme = JSON.parse(saved);
+          for (var name in theme.vars) root.style.setProperty(name, theme.vars[name]);
+          root.style.colorScheme = theme.mode || "dark";
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

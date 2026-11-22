@@ -1,2 +1,8 @@
 .agents/
 .impeccable/
+
+# React build (Vite)
+app/node_modules/
+app/dist/
+app/src/style.css
+app/src/themes.css
