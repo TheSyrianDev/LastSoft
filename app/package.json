@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "prebuild": "node copy-css.mjs"
+    "prebuild": "node copy-css.mjs",
+    "postbuild": "node copy-static.mjs"
   },
   "dependencies": {
     "gsap": "^3.13.0",
