@@ -38,7 +38,22 @@ async function figure() {
   const read = (name, fallback) =>
     getComputedStyle(document.documentElement).getPropertyValue(name).trim() || fallback;
 
-  /* soft round sprite, shared by every node and particle */
+  /* denser sprite for the nodes themselves, so they read as thick orbs */
+  const orbTexture = (() => {
+    const c = document.createElement("canvas");
+    c.width = c.height = 128;
+    const g = c.getContext("2d");
+    const grad = g.createRadialGradient(64, 64, 0, 64, 64, 64);
+    grad.addColorStop(0, "rgba(255,255,255,1)");
+    grad.addColorStop(0.42, "rgba(255,255,255,0.96)");
+    grad.addColorStop(0.68, "rgba(255,255,255,0.5)");
+    grad.addColorStop(1, "rgba(255,255,255,0)");
+    g.fillStyle = grad;
+    g.fillRect(0, 0, 128, 128);
+    return new THREE.CanvasTexture(c);
+  })();
+
+  /* softer sprite for the particles travelling the edges */
   const glowTexture = (() => {
     const c = document.createElement("canvas");
     c.width = c.height = 128;
@@ -100,7 +115,7 @@ async function figure() {
     const i = pts.length - 1;
     const m = new THREE.Sprite(
       new THREE.SpriteMaterial({
-        map: glowTexture,
+        map: orbTexture,
         color: cols[i].clone(),
         transparent: true,
         opacity: 0.95,
@@ -114,14 +129,14 @@ async function figure() {
     return i;
   };
 
-  addNode(new THREE.Vector3(0, 0, 0), 0.92, 0);
+  addNode(new THREE.Vector3(0, 0, 0), 1.35, 0);
 
   const edges = [];
 
   for (let i = 0; i < DEPTS; i++) {
     const a = (i / DEPTS) * Math.PI * 2 + rand(-0.18, 0.18);
     const d = new THREE.Vector3(Math.cos(a) * RING, rand(-1.3, 1.3), Math.sin(a) * RING);
-    const di = addNode(d, 0.6, 0.14 + (d.length() / MAXD) * 0.3 + rand(-0.05, 0.05));
+    const di = addNode(d, 0.88, 0.14 + (d.length() / MAXD) * 0.3 + rand(-0.05, 0.05));
     edges.push([0, di]);
 
     const workers = 1 + Math.floor(Math.random() * 3); // 1..3 workers each
@@ -132,7 +147,7 @@ async function figure() {
         d.y + rand(-1.0, 1.0),
         d.z + Math.sin(wa) * rand(1.5, 1.9)
       );
-      const wi = addNode(p, 0.32, 0.6 + (p.length() / (MAXD * 1.25)) * 0.38 + rand(-0.05, 0.05));
+      const wi = addNode(p, 0.5, 0.6 + (p.length() / (MAXD * 1.25)) * 0.38 + rand(-0.05, 0.05));
       edges.push([di, wi]);
     }
   }

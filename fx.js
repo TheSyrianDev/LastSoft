@@ -271,6 +271,147 @@
             requestAnimationFrame(loop);
           })();
         }
+      } else if (mode === "field") {
+
+        /* Curl-noise streaks: hundreds of short strokes advected along a slowly
+           turning flow field, stirred into a vortex by the pointer. */
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(58, 1, 0.1, 200);
+        camera.position.set(0, 0, 30);
+
+        const COUNT = 300;
+        const pos = new Float32Array(COUNT * 3);
+        const prev = new Float32Array(COUNT * 3);
+        const seeds = new Float32Array(COUNT);
+        const rand = (a, b) => a + Math.random() * (b - a);
+        for (let i = 0; i < COUNT; i++) {
+          pos[i * 3] = rand(-1, 1);
+          pos[i * 3 + 1] = rand(-1, 1);
+          pos[i * 3 + 2] = rand(-0.3, 0.3);
+          seeds[i] = 0.7 + Math.random() * 1.1;
+        }
+
+        const linePos = new Float32Array(COUNT * 6);
+        const lineCol = new Float32Array(COUNT * 6);
+        const geo = new THREE.BufferGeometry();
+        geo.setAttribute("position", new THREE.BufferAttribute(linePos, 3));
+        geo.setAttribute("color", new THREE.BufferAttribute(lineCol, 3));
+        scene.add(
+          new THREE.LineSegments(
+            geo,
+            new THREE.LineBasicMaterial({
+              vertexColors: true,
+              transparent: true,
+              opacity: 0.62,
+              blending: THREE.AdditiveBlending,
+              depthWrite: false,
+            })
+          )
+        );
+
+        let halfW = 20;
+        let halfH = 12;
+        function resize() {
+          const w = window.innerWidth;
+          const h = window.innerHeight;
+          if (!w || !h) return;
+          renderer.setSize(w, h, false);
+          camera.aspect = w / h;
+          camera.updateProjectionMatrix();
+          halfH = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * camera.position.z;
+          halfW = halfH * camera.aspect;
+        }
+        resize();
+        window.addEventListener("resize", resize);
+
+        const field = (x, y, t) =>
+          Math.sin(x * 0.0035 + t * 0.32) * Math.cos(y * 0.0031 - t * 0.27) +
+          0.55 * Math.sin((x + y) * 0.0019 + t * 0.17);
+
+        window.addEventListener(
+          "pointermove",
+          (e) => {
+            pointer.tx = (e.clientX / window.innerWidth) * 2 - 1;
+            pointer.ty = -((e.clientY / window.innerHeight) * 2 - 1);
+            pointer.moved = performance.now();
+          },
+          { passive: true }
+        );
+
+        watch(() => {
+          ground.set(token("--ground", "#0b120e"));
+          accent.set(token("--accent", "#b2c27c"));
+        });
+
+        function paint(t) {
+          pointer.x += (pointer.tx - pointer.x) * 0.08;
+          pointer.y += (pointer.ty - pointer.y) * 0.08;
+          const px = pointer.x * halfW;
+          const py = pointer.y * halfH;
+
+          for (let i = 0; i < COUNT; i++) {
+            const ix = i * 3;
+            const nx = pos[ix];
+            const ny = pos[ix + 1];
+
+            const ang = field(nx, ny, t) * Math.PI;
+            let vx = Math.cos(ang);
+            let vy = Math.sin(ang);
+
+            const dx = nx * halfW - px;
+            const dy = ny * halfH - py;
+            const d2 = dx * dx + dy * dy;
+            if (d2 < 32) {
+              const d = Math.sqrt(d2) || 1;
+              const f = (1 - d / 5.6) * 2.4;
+              vx += (-dy / d) * f + (dx / d) * f * 0.35;
+              vy += (dx / d) * f + (dy / d) * f * 0.35;
+            }
+
+            prev[ix] = nx;
+            prev[ix + 1] = ny;
+            const sp = seeds[i];
+            let X = nx + vx * sp * 0.085;
+            let Y = ny + vy * sp * 0.085;
+            if (X < -1.06) X = 1.06;
+            else if (X > 1.06) X = -1.06;
+            if (Y < -1.06) Y = 1.06;
+            else if (Y > 1.06) Y = -1.06;
+            pos[ix] = X;
+            pos[ix + 1] = Y;
+
+            const o = i * 6;
+            linePos[o] = prev[ix] * halfW;
+            linePos[o + 1] = prev[ix + 1] * halfH;
+            linePos[o + 2] = pos[ix + 2] * 4;
+            linePos[o + 3] = X * halfW;
+            linePos[o + 4] = Y * halfH;
+            linePos[o + 5] = pos[ix + 2] * 4;
+
+            const glow = Math.max(0, 1 - Math.sqrt(d2) / 7);
+            tint.copy(ground).lerp(accent, 0.62 + glow * 0.38);
+            lineCol[o] = tint.r;
+            lineCol[o + 1] = tint.g;
+            lineCol[o + 2] = tint.b;
+            lineCol[o + 3] = tint.r;
+            lineCol[o + 4] = tint.g;
+            lineCol[o + 5] = tint.b;
+          }
+          geo.attributes.position.needsUpdate = true;
+          geo.attributes.color.needsUpdate = true;
+
+          renderer.render(scene, camera);
+        }
+
+        if (reduce) {
+          paint(1.7);
+        } else {
+          const clock = new THREE.Clock();
+          (function loop() {
+            paint(clock.getElapsedTime());
+            requestAnimationFrame(loop);
+          })();
+        }
       } else {
       const COUNT = 80;
       const LINK = 9.5;
