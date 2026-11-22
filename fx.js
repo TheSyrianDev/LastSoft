@@ -66,6 +66,212 @@
     }
 
     if (renderer) {
+      const mode = fieldCanvas.dataset.fxMode || "drift";
+      if (mode === "flow") {
+
+        /* Directed flow: a fixed network with pulses travelling the edges,
+           like a goal moving through the team. Deliberately not the soft
+           drifting constellation the portfolio uses. */
+        const CELL = 5.4;
+        const MAXN = 420;
+        const MAXE = 1400;
+        const PULSES = 26;
+
+        const nodePos = new Float32Array(MAXN * 3);
+        const edgePos = new Float32Array(MAXE * 6);
+        const nodeGeo = new THREE.BufferGeometry();
+        nodeGeo.setAttribute("position", new THREE.BufferAttribute(nodePos, 3));
+        const nodeMat = new THREE.PointsMaterial({
+          size: 1.5,
+          map: sprite,
+          transparent: true,
+          depthWrite: false,
+          color: accent.clone(),
+          opacity: 0.7,
+        });
+        scene.add(new THREE.Points(nodeGeo, nodeMat));
+
+        const edgeGeo = new THREE.BufferGeometry();
+        edgeGeo.setAttribute("position", new THREE.BufferAttribute(edgePos, 3));
+        const edgeMat = new THREE.LineBasicMaterial({
+          color: accent.clone(),
+          transparent: true,
+          opacity: 0.3,
+          depthWrite: false,
+        });
+        scene.add(new THREE.LineSegments(edgeGeo, edgeMat));
+
+        const headPos = new Float32Array(PULSES * 3);
+        const headGeo = new THREE.BufferGeometry();
+        headGeo.setAttribute("position", new THREE.BufferAttribute(headPos, 3));
+        const headMat = new THREE.PointsMaterial({
+          size: 3.6,
+          map: sprite,
+          transparent: true,
+          depthWrite: false,
+          color: accent.clone(),
+          opacity: 0.95,
+        });
+        scene.add(new THREE.Points(headGeo, headMat));
+
+        const tailPos = new Float32Array(PULSES * 6);
+        const tailGeo = new THREE.BufferGeometry();
+        tailGeo.setAttribute("position", new THREE.BufferAttribute(tailPos, 3));
+        const tailMat = new THREE.LineBasicMaterial({
+          color: accent.clone(),
+          transparent: true,
+          opacity: 0.75,
+          depthWrite: false,
+        });
+        scene.add(new THREE.LineSegments(tailGeo, tailMat));
+
+        let nodes = [];
+        let edges = [];
+        let adj = [];
+        let cols = 0;
+        let rows = 0;
+        const pulses = [];
+
+        function build() {
+          nodes = [];
+          edges = [];
+          cols = Math.max(4, Math.round((halfW * 2) / CELL));
+          rows = Math.max(3, Math.round((halfH * 2) / CELL));
+          const sx = (halfW * 2) / cols;
+          const sy = (halfH * 2) / rows;
+
+          for (let r = 0; r < rows; r++) {
+            for (let c = 0; c < cols; c++) {
+              nodes.push({
+                x: -halfW + (c + 0.5) * sx + (Math.random() - 0.5) * sx * 0.5,
+                y: -halfH + (r + 0.5) * sy + (Math.random() - 0.5) * sy * 0.5,
+                z: (Math.random() - 0.5) * 2,
+              });
+            }
+          }
+
+          const at = (c, r) => r * cols + c;
+          for (let r = 0; r < rows; r++) {
+            for (let c = 0; c < cols; c++) {
+              if (c + 1 < cols) edges.push([at(c, r), at(c + 1, r)]);
+              if (r + 1 < rows) edges.push([at(c, r), at(c, r + 1)]);
+              if (c + 1 < cols && r + 1 < rows && Math.random() < 0.28) {
+                edges.push([at(c, r), at(c + 1, r + 1)]);
+              }
+            }
+          }
+          adj = nodes.map(() => []);
+          edges.forEach((e, i) => {
+            adj[e[0]].push(i);
+            adj[e[1]].push(i);
+          });
+
+          nodes.forEach((n, i) => {
+            nodePos[i * 3] = n.x;
+            nodePos[i * 3 + 1] = n.y;
+            nodePos[i * 3 + 2] = n.z;
+          });
+          nodeGeo.setDrawRange(0, nodes.length);
+          nodeGeo.attributes.position.needsUpdate = true;
+
+          edges.forEach((e, i) => {
+            const a = nodes[e[0]];
+            const b = nodes[e[1]];
+            edgePos[i * 6] = a.x;
+            edgePos[i * 6 + 1] = a.y;
+            edgePos[i * 6 + 2] = a.z;
+            edgePos[i * 6 + 3] = b.x;
+            edgePos[i * 6 + 4] = b.y;
+            edgePos[i * 6 + 5] = b.z;
+          });
+          edgeGeo.setDrawRange(0, edges.length * 2);
+          edgeGeo.attributes.position.needsUpdate = true;
+
+          pulses.length = 0;
+          for (let i = 0; i < PULSES; i++) {
+            pulses.push({
+              e: (Math.random() * edges.length) | 0,
+              t: Math.random(),
+              toward: Math.random() < 0.5 ? 1 : -1,
+              speed: 0.3 + Math.random() * 0.4,
+            });
+          }
+        }
+
+        let halfW = 20;
+        let halfH = 12;
+        function resize() {
+          const w = window.innerWidth;
+          const h = window.innerHeight;
+          if (!w || !h) return;
+          renderer.setSize(w, h, false);
+          camera.aspect = w / h;
+          camera.updateProjectionMatrix();
+          halfH = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * camera.position.z;
+          halfW = halfH * camera.aspect;
+          build();
+        }
+        resize();
+        window.addEventListener("resize", resize);
+
+        watch(() => {
+          const c = accent.set(token("--accent", "#b2c27c"));
+          nodeMat.color.copy(c);
+          edgeMat.color.copy(c);
+          headMat.color.copy(c);
+          tailMat.color.copy(c);
+          ground.set(token("--ground", "#0b120e"));
+        });
+
+        let last = 0;
+        function paint(t) {
+          const dt = Math.min(Math.max(t - last, 0), 0.05);
+          last = t;
+
+          for (let i = 0; i < pulses.length; i++) {
+            const p = pulses[i];
+            p.t += p.speed * dt;
+            if (p.t >= 1) {
+              p.t = 0;
+              const arrive = edges[p.e][p.toward === 1 ? 1 : 0];
+              const options = adj[arrive].length ? adj[arrive] : [p.e];
+              const next = options[(Math.random() * options.length) | 0];
+              p.e = next;
+              p.toward = edges[next][0] === arrive ? 1 : -1;
+            }
+            const a = nodes[edges[p.e][0]];
+            const b = nodes[edges[p.e][1]];
+            const tt = p.toward === 1 ? p.t : 1 - p.t;
+            const tb = Math.max(0, tt - 0.14);
+            const x = a.x + (b.x - a.x) * tt;
+            const y = a.y + (b.y - a.y) * tt;
+            const z = a.z + (b.z - a.z) * tt;
+            headPos[i * 3] = x;
+            headPos[i * 3 + 1] = y;
+            headPos[i * 3 + 2] = z;
+            tailPos[i * 6] = a.x + (b.x - a.x) * tb;
+            tailPos[i * 6 + 1] = a.y + (b.y - a.y) * tb;
+            tailPos[i * 6 + 2] = a.z + (b.z - a.z) * tb;
+            tailPos[i * 6 + 3] = x;
+            tailPos[i * 6 + 4] = y;
+            tailPos[i * 6 + 5] = z;
+          }
+          headGeo.attributes.position.needsUpdate = true;
+          tailGeo.attributes.position.needsUpdate = true;
+
+          renderer.render(scene, camera);
+        }
+
+        if (reduce) {
+          paint(0.001);
+        } else {
+          const clock = new THREE.Clock();
+          (function loop() {
+            paint(clock.getElapsedTime());
+            requestAnimationFrame(loop);
+          })();
+        }
+      } else {
       const COUNT = 80;
       const LINK = 9.5;
       const MAX_LINKS = 900;
@@ -218,6 +424,7 @@
           paint(clock.getElapsedTime());
           requestAnimationFrame(loop);
         })();
+      }
       }
     }
   }

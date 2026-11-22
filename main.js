@@ -39,75 +39,110 @@ async function figure() {
   root.rotation.x = -0.42;
   scene.add(root);
 
-  const read = (name, fallback) => {
-    const v = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-    return v || fallback;
-  };
+  const read = (name, fallback) =>
+    getComputedStyle(document.documentElement).getPropertyValue(name).trim() || fallback;
 
-  const materials = {
-    core: new THREE.MeshBasicMaterial({ color: read("--accent", "#b2c27c") }),
-    dept: new THREE.MeshBasicMaterial({ color: read("--accent-2", "#e0a050") }),
-    leaf: new THREE.MeshBasicMaterial({ color: read("--leaf", "#93a563") }),
-    edge: new THREE.LineBasicMaterial({ color: read("--ink", "#ece6d7"), transparent: true, opacity: 0.2 }),
-    dust: new THREE.PointsMaterial({
-      color: read("--accent", "#b2c27c"),
-      size: 0.06,
-      transparent: true,
-      opacity: 0.95,
-      depthWrite: false,
-    }),
+  /* The theme's own three accents become gradient stops, so the structure
+     carries the same colours as the rest of the site in that palette. */
+  const stops = [
+    new THREE.Color(read("--accent", "#b2c27c")),
+    new THREE.Color(read("--accent-2", "#e0a050")),
+    new THREE.Color(read("--leaf", "#93a563")),
+  ];
+  const ramp = (t, out) => {
+    const x = Math.min(Math.max(t, 0), 1) * (stops.length - 1);
+    const i = Math.min(Math.floor(x), stops.length - 2);
+    return out.copy(stops[i]).lerp(stops[i + 1], x - i);
   };
 
   const rand = (a, b) => a + Math.random() * (b - a);
-  const DEPTS = 3 + Math.floor(Math.random() * 4); // 3..6 departments
-  const RING = 2.2;
+  const DEPTS = 3 + Math.floor(Math.random() * 3); // 3..5 departments
+  const RING = 2.7;
+  const MAXD = RING + 1.5;
 
-  const core = new THREE.Mesh(new THREE.SphereGeometry(0.5, 32, 32), materials.core);
+  const nodeMaterial = (color) => new THREE.MeshBasicMaterial({ color: color.clone() });
+
+  const pts = [new THREE.Vector3(0, 0, 0)];
+  const ts = [0];
+  const cols = [ramp(0, new THREE.Color())];
+  const meshes = [];
+
+  const core = new THREE.Mesh(new THREE.SphereGeometry(0.5, 32, 32), nodeMaterial(cols[0]));
   root.add(core);
-  const halo = new THREE.Mesh(
-    new THREE.SphereGeometry(0.78, 32, 32),
-    new THREE.MeshBasicMaterial({ color: read("--accent", "#b2c27c"), transparent: true, opacity: 0.13 })
-  );
-  root.add(halo);
+  meshes.push(core);
 
   const edges = [];
+
+  const addNode = (pos, radius, t) => {
+    pts.push(pos.clone());
+    ts.push(t);
+    cols.push(ramp(t, new THREE.Color()));
+    const i = pts.length - 1;
+    const mesh = new THREE.Mesh(new THREE.SphereGeometry(radius, 20, 20), nodeMaterial(cols[i]));
+    mesh.position.copy(pos);
+    root.add(mesh);
+    meshes.push(mesh);
+    return i;
+  };
 
   for (let i = 0; i < DEPTS; i++) {
     const a = (i / DEPTS) * Math.PI * 2 + rand(-0.14, 0.14);
     const d = new THREE.Vector3(Math.cos(a) * RING, rand(-1.0, 1.0), Math.sin(a) * RING);
-    const dept = new THREE.Mesh(new THREE.SphereGeometry(0.24, 20, 20), materials.dept);
-    dept.position.copy(d);
-    root.add(dept);
-    edges.push([new THREE.Vector3(0, 0, 0), d]);
+    const di = addNode(d, 0.26, 0.12 + (d.length() / MAXD) * 0.3 + rand(-0.04, 0.04));
+    edges.push([0, di]);
 
-    const workers = 1 + Math.floor(Math.random() * 5); // 1..5 workers each
+    const workers = 1 + Math.floor(Math.random() * 4); // 1..4 workers each
     for (let w = 0; w < workers; w++) {
       const wa = (w / workers) * Math.PI * 2 + rand(-0.35, 0.35);
       const p = new THREE.Vector3(
-        d.x + Math.cos(wa) * rand(0.85, 1.1),
+        d.x + Math.cos(wa) * rand(1.15, 1.45),
         d.y + rand(-0.75, 0.75),
-        d.z + Math.sin(wa) * rand(0.95, 1.3)
+        d.z + Math.sin(wa) * rand(1.15, 1.45)
       );
-      const worker = new THREE.Mesh(new THREE.SphereGeometry(0.12, 14, 14), materials.leaf);
-      worker.position.copy(p);
-      root.add(worker);
-      edges.push([d, p]);
+      const wi = addNode(p, 0.13, 0.58 + (p.length() / (MAXD * 1.3)) * 0.4 + rand(-0.04, 0.04));
+      edges.push([di, wi]);
     }
   }
 
   const edgePositions = [];
-  edges.forEach(([a, b]) => edgePositions.push(a.x, a.y, a.z, b.x, b.y, b.z));
+  const edgeColors = [];
+  edges.forEach(([i, j]) => {
+    edgePositions.push(pts[i].x, pts[i].y, pts[i].z, pts[j].x, pts[j].y, pts[j].z);
+    edgeColors.push(cols[i].r, cols[i].g, cols[i].b, cols[j].r, cols[j].g, cols[j].b);
+  });
   const edgeGeometry = new THREE.BufferGeometry();
   edgeGeometry.setAttribute("position", new THREE.Float32BufferAttribute(edgePositions, 3));
-  root.add(new THREE.LineSegments(edgeGeometry, materials.edge));
+  edgeGeometry.setAttribute("color", new THREE.Float32BufferAttribute(edgeColors, 3));
+  root.add(
+    new THREE.LineSegments(
+      edgeGeometry,
+      new THREE.LineBasicMaterial({
+        vertexColors: true,
+        transparent: true,
+        opacity: 1,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+      })
+    )
+  );
 
   const particles = [];
   edges.forEach((e, i) => {
-    for (let k = 0; k < 2; k++) particles.push({ e: i, t: Math.random(), s: rand(0.1, 0.28) });
+    for (let k = 0; k < 3; k++) particles.push({ e: i, t: Math.random(), s: rand(0.1, 0.28) });
   });
   const dustGeo = new THREE.BufferGeometry();
   dustGeo.setAttribute("position", new THREE.Float32BufferAttribute(new Float32Array(particles.length * 3), 3));
-  const dust = new THREE.Points(dustGeo, materials.dust);
+  dustGeo.setAttribute("color", new THREE.Float32BufferAttribute(new Float32Array(particles.length * 3), 3));
+  const dust = new THREE.Points(
+    dustGeo,
+    new THREE.PointsMaterial({
+      size: 0.16,
+      vertexColors: true,
+      transparent: true,
+      opacity: 0.95,
+      depthWrite: false,
+    })
+  );
   root.add(dust);
 
   function resize() {
@@ -120,13 +155,25 @@ async function figure() {
   resize();
   window.addEventListener("resize", resize);
 
+  const scratch = new THREE.Color();
   new MutationObserver(() => {
-    materials.core.color.set(read("--accent", "#b2c27c"));
-    materials.dept.color.set(read("--accent-2", "#e0a050"));
-    materials.leaf.color.set(read("--leaf", "#93a563"));
-    materials.edge.color.set(read("--ink", "#ece6d7"));
-    materials.dust.color.set(read("--accent", "#b2c27c"));
-    halo.material.color.set(read("--accent", "#b2c27c"));
+    stops[0].set(read("--accent", "#b2c27c"));
+    stops[1].set(read("--accent-2", "#e0a050"));
+    stops[2].set(read("--leaf", "#93a563"));
+    for (let i = 0; i < ts.length; i++) {
+      ramp(ts[i], cols[i]);
+      if (meshes[i]) meshes[i].material.color.copy(cols[i]);
+    }
+    let k = 0;
+    edges.forEach(([i, j]) => {
+      edgeColors[k++] = cols[i].r;
+      edgeColors[k++] = cols[i].g;
+      edgeColors[k++] = cols[i].b;
+      edgeColors[k++] = cols[j].r;
+      edgeColors[k++] = cols[j].g;
+      edgeColors[k++] = cols[j].b;
+    });
+    edgeGeometry.attributes.color.needsUpdate = true;
   }).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme", "style"] });
 
   const clock = new THREE.Clock();
@@ -139,14 +186,23 @@ async function figure() {
     core.scale.setScalar(1 + Math.sin(t * 1.6) * 0.045);
 
     const pos = dust.geometry.attributes.position;
+    const col = dust.geometry.attributes.color;
     for (let i = 0; i < particles.length; i++) {
       const p = particles[i];
       p.t += dt * p.s;
       if (p.t > 1) p.t -= 1;
       const [a, b] = edges[p.e];
-      pos.setXYZ(i, a.x + (b.x - a.x) * p.t, a.y + (b.y - a.y) * p.t, a.z + (b.z - a.z) * p.t);
+      pos.setXYZ(
+        i,
+        pts[a].x + (pts[b].x - pts[a].x) * p.t,
+        pts[a].y + (pts[b].y - pts[a].y) * p.t,
+        pts[a].z + (pts[b].z - pts[a].z) * p.t
+      );
+      scratch.copy(cols[a]).lerp(cols[b], p.t);
+      col.setXYZ(i, scratch.r, scratch.g, scratch.b);
     }
     pos.needsUpdate = true;
+    col.needsUpdate = true;
 
     renderer.render(scene, camera);
     if (!reduce) requestAnimationFrame(frame);
